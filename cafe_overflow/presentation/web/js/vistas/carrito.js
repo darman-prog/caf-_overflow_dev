@@ -3,7 +3,7 @@
    La UI solo formatea con Intl; jamás suma ni multiplica dinero. */
 import { api, ApiError } from "../api.js";
 import {
-  badgePuntos, botonCargando, cop, el, getClienteId, guardarCarrito,
+  abrirRegistro, badgePuntos, botonCargando, cop, el, getClienteId, guardarCarrito,
   leerCarrito, toast, vaciarCarrito,
 } from "../ui.js";
 
@@ -150,7 +150,7 @@ function refrescar() {
 async function confirmar(boton) {
   const clienteId = getClienteId();
   if (!clienteId) {
-    document.getElementById("dialogo-registro")?.showModal();
+    abrirRegistro();
     return;
   }
   const { items, canje } = cuerpoPedido();
@@ -207,6 +207,18 @@ function init() {
   });
   window.addEventListener("carrito:actualizado", () => refrescar());
   window.addEventListener("pedidos:actualizado", () => pintarDisponibles());
+  window.addEventListener("cliente:actualizado", () => {
+    // Al cambiar de sesión se limpia el canje escrito y se recalcula la vista.
+    if (!getClienteId()) {
+      devpointsEditados = "";
+      const campo = document.getElementById("devpoints-input");
+      if (campo) {
+        campo.value = "";
+        campo.removeAttribute("aria-invalid");
+      }
+    }
+    refrescar();
+  });
   cargarCatalogo();
   pintarDisponibles();
 }

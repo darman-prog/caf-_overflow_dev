@@ -76,8 +76,12 @@ export const api = {
       cuerpo: { cliente_id, items, devpoints_a_canjear },
     });
   },
-  listarPedidos(estado) {
-    const qs = estado ? `?estado=${encodeURIComponent(estado)}` : "";
+  // Filtros opcionales que resuelve el servidor; la UI solo los pide.
+  listarPedidos({ estado, cliente_id } = {}) {
+    const params = new URLSearchParams();
+    if (estado) params.set("estado", estado);
+    if (cliente_id !== undefined && cliente_id !== null) params.set("cliente_id", String(cliente_id));
+    const qs = [...params].length > 0 ? `?${params.toString()}` : "";
     return request(`/api/pedidos${qs}`);
   },
   confirmarPago(id) {

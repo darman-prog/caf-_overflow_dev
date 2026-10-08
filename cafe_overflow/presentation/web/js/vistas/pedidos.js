@@ -1,8 +1,8 @@
 /* pedidos.js — "Mis pedidos" del cliente: pipeline, badge, total del servidor.
-   Filtra por cliente_id en presentación; el dinero siempre viene del servidor. */
+   Fuente única: el servidor filtra por ?cliente_id= de la sesión. */
 import { api, ApiError } from "../api.js";
 import {
-  badgeEstado, botonCargando, cop, el, getClienteId,
+  abrirRegistro, badgeEstado, botonCargando, cop, el, getClienteId,
   pipeline, skeletonLinea, estadoError, estadoVacio, toast,
 } from "../ui.js";
 
@@ -75,7 +75,7 @@ async function cargar() {
       estadoVacio({
         titulo: "Regístrate para ver tus pedidos.",
         accionTexto: "Registrarme",
-        alAccion: () => document.getElementById("dialogo-registro")?.showModal(),
+        alAccion: () => abrirRegistro(),
       })
     );
     return;
@@ -83,9 +83,8 @@ async function cargar() {
   seccion.setAttribute("aria-busy", "true");
   estado.appendChild(skeletonLinea("cargando pedidos"));
   try {
-    // La API no filtra por cliente: se muestran solo los propios en presentación.
-    const todos = await api.listarPedidos();
-    const mios = todos.filter((p) => String(p.cliente_id) === String(clienteId));
+    // Fuente única: el servidor devuelve solo los pedidos de la sesión.
+    const mios = await api.listarPedidos({ cliente_id: clienteId });
     estado.textContent = "";
     if (mios.length === 0) {
       estado.appendChild(

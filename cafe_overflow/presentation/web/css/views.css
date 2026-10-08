@@ -1,10 +1,15 @@
-/* views.css — vistas y layout mobile-first (DESING.md §6). */
+/* views.css — vistas y layout mobile-first (DESING.md §6).
+   v1.1: prompt terminal con token de identidad propio, anclaje de breakpoints
+   al token, min-height de columnas kanban en desktop y trade-off documentado
+   en el bloque de pedidos. */
 
 /* Fusión terminal-café: prompt decorativo ante títulos de sección.
-   Va en CSS para que los lectores no lo anuncien; no compite con los datos. */
+   Va en CSS para que los lectores no lo anuncien; no compite con los datos.
+   Usa --accent-terminal (identidad), no --color-success (semántico de éxito):
+   cambiar el verde de éxito no debe redecorar todos los títulos. */
 .seccion__cabecera h2::before {
   content: "> ";
-  color: var(--color-success);
+  color: var(--accent-terminal, var(--color-success));
   font-family: var(--font-mono);
 }
 
@@ -18,12 +23,14 @@
   padding: 0;
 }
 
+/* bp-md = --bp-md (640px): CSS no admite var() en media queries. */
 @media (min-width: 640px) {
   .menu-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* bp-lg = --bp-lg (1024px): ídem. */
 @media (min-width: 1024px) {
   .menu-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -44,6 +51,7 @@
   gap: var(--space-4);
 }
 
+/* bp-lg = --bp-lg (1024px). */
 @media (min-width: 1024px) {
   .carrito-layout {
     grid-template-columns: 2fr 1fr;
@@ -77,7 +85,10 @@
   font-size: var(--text-sm);
 }
 
-/* Mis pedidos: cards en móvil, tabla en desktop. */
+/* Mis pedidos: cards en móvil, tabla en desktop.
+   Trade-off aceptado: el DOM duplica los datos en dos representaciones;
+   display:none excluye la oculta del árbol de accesibilidad, así que un
+   lector de pantalla nunca anuncia el mismo pedido dos veces. */
 .pedidos-tabla {
   display: none;
 }
@@ -92,6 +103,7 @@
   min-width: var(--space-3);
 }
 
+/* bp-lg = --bp-lg (1024px). */
 @media (min-width: 1024px) {
   .pedidos-tabla {
     display: block;
@@ -127,6 +139,7 @@
   margin: 0;
 }
 
+/* bp-md = --bp-md (640px). */
 @media (min-width: 640px) {
   .perfil-stats {
     grid-template-columns: repeat(3, 1fr);
@@ -195,6 +208,7 @@
   color: var(--text-muted);
 }
 
+/* bp-lg = --bp-lg (1024px). */
 @media (min-width: 1024px) {
   .personal-board {
     grid-template-columns: repeat(4, 1fr);
@@ -204,5 +218,10 @@
   /* En desktop el filtro no limita columnas: todas visibles. */
   .personal-columna[hidden] {
     display: block;
+  }
+
+  /* Columna vacía no colapsa: el tablero mantiene la lectura de 4 pistas. */
+  .personal-columna {
+    min-height: 24rem;
   }
 }

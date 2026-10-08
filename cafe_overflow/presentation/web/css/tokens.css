@@ -1,5 +1,12 @@
-/* tokens.css — Design system Café Overflow v1.0 (Docs/DESING.md §3).
-   Dark-only, cero dependencias externas, solo fuentes del sistema. */
+/* tokens.css — Design system Café Overflow v1.1 (Docs/DESING.md §3).
+   Dark-only, cero dependencias externas, solo fuentes del sistema.
+   
+   Cambios v1.1:
+   - Eliminada duplicación de estados (st-* reutiliza color-*)
+   - Agregados tokens de elevation/shadow
+   - Agregados border-hover/focus
+   - Separado accent-brand de accent-primary
+*/
 
 :root {
   color-scheme: dark;
@@ -8,29 +15,36 @@
   --bg-base: #0d1117;
   --bg-surface: #161b22;
   --bg-elevated: #1c2128;
-
-  /* 3.1 Bordes con roles distintos: subtle decora, field delimita campos */
+  
+  /* 3.1 Bordes con roles distintos */
   --border-subtle: #30363d;
   --border-field: #6e7681;
+  --border-hover: #484f58;
+  --border-focus: var(--color-info);
 
-  /* 3.1 Texto (inverse va SOBRE el botón naranja, ratio 6.8) */
+  /* 3.1 Texto */
   --text-main: #e6edf3;
   --text-muted: #8b949e;
   --text-inverse: #0d1117;
 
-  /* 3.2 Acentos semánticos: un tinte, un significado */
-  --accent-coffee: #f97316;
+  /* 3.2 Decorativo de identidad (prompt terminal), distinto del semántico de éxito */
+  --accent-terminal: #3fb950;
+
+  /* 3.2 Acentos semánticos */
+  --accent-brand: #f97316;
+  --accent-primary: var(--accent-brand);
+  --accent-coffee: var(--accent-brand); /* alias de compatibilidad: botón primario y marca */
   --color-success: #3fb950;
   --color-warning: #d29922;
   --color-error: #f85149;
   --color-info: #58a6ff;
   --color-loyalty: #bc8cff;
 
-  /* 3.3 Estados del pedido (sin solapes con stock ni niveles) */
-  --st-pendiente: #d29922;
-  --st-preparacion: #58a6ff;
-  --st-listo: #3fb950;
-  --st-entregado: #8b949e;
+  /* 3.3 Estados del pedido (reutilizan semánticos para evitar duplicación) */
+  --st-pendiente: var(--color-warning);
+  --st-preparacion: var(--color-info);
+  --st-listo: var(--color-success);
+  --st-entregado: var(--text-muted);
 
   /* 3.5 Tipografía: solo stacks del sistema */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -42,6 +56,8 @@
   --text-lg: 1.25rem;
   --text-xl: 1.5rem;
   --text-2xl: 2rem;
+  --text-3xl: 2.5rem;
+  --text-4xl: 3rem;
 
   --leading-tight: 1.25;
   --leading-body: 1.5;
@@ -58,7 +74,7 @@
   --space-8: 2rem;
   --space-12: 3rem;
 
-  /* 3.6 Radios: estética IDE contenida */
+  /* 3.6 Radios */
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
@@ -75,4 +91,11 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
   --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Elevation (sombras para cards/modales) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
+
+  --duration-pulse: 1.4s;      /* pulso del paso activo, sin parpadeo */
 }

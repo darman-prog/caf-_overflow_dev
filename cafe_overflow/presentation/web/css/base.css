@@ -1,11 +1,40 @@
-/* base.css — reset mínimo, tipografía, foco y layout base (DESING.md §3.5, §3.8, §6). */
+/* base.css — reset mínimo, tipografía, foco y layout base (DESING.md §3.5, §3.8, §6).
+   
+   Cambios v1.1:
+   - Reset completo de button/input/select/textarea
+   - Skip-link mejorado con transform
+   - Contenedor con padding responsive
+   - Agregada clase sr-only
+   - Secciones con border más visible y padding-top
+   - Easing aplicado a transiciones
+*/
 
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
+/* Reset de elementos interactivos */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  margin: 0;
+
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input, textarea {
+  background: none;
+  border: none;
+  outline: none;
+}
+
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior movido a anchors específicos abajo */
 }
 
 body {
@@ -18,7 +47,12 @@ body {
   min-height: 100vh;
 }
 
-/* Foco solo con teclado, según §3.8. */
+/* Scroll suave solo para anchors internos */
+a[href^="#"] {
+  scroll-behavior: smooth;
+}
+
+/* Foco solo con teclado, según §3.8 */
 :focus-visible {
   outline: var(--focus-ring);
   outline-offset: var(--focus-offset);
@@ -26,7 +60,8 @@ body {
 
 h1, h2, h3 {
   line-height: var(--leading-tight);
-  margin: 0 0 var(--space-4);
+  margin-top: 0;
+  margin-bottom: var(--space-4);
 }
 
 h1 {
@@ -44,32 +79,61 @@ h3 {
   font-weight: var(--weight-medium);
 }
 
+/* Reducir espacio después de heading cuando sigue un párrafo */
+h1 + p, h2 + p, h3 + p {
+  margin-top: calc(var(--space-4) * -0.5);
+}
+
 p {
   margin: 0 0 var(--space-4);
 }
 
 a {
   color: var(--color-info);
+  transition: color var(--duration-fast) var(--easing-standard);
 }
 
-/* Cifras monetarias, IDs y saldos: mono + tabulares (§3.5). */
+a:hover {
+  color: var(--accent-primary);
+}
+
+/* Cifras monetarias, IDs y saldos: mono + tabulares (§3.5) */
 .mono, .precio, .pedido-id, .saldo-puntos {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
-/* Contenedor centrado con ancho máximo (§6). */
+/* Contenedor centrado con ancho máximo y padding responsive (§6) */
 .contenedor {
   max-width: var(--content-max);
   margin-inline: auto;
-  padding-inline: var(--space-4);
+  padding: var(--space-4);
 }
 
-/* Enlace de salto para teclado y lectores (§accesibilidad). */
-.skip-link {
+@media (min-width: 640px) {
+  .contenedor {
+    padding: var(--space-6);
+  }
+}
+
+/* Clase para contenido solo accesible por screen readers */
+.sr-only {
   position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Enlace de salto para teclado y lectores (§accesibilidad) */
+.skip-link {
+  position: fixed;
   left: var(--space-4);
-  top: -100px;
+  top: var(--space-4);
   background: var(--bg-elevated);
   color: var(--text-main);
   border: 1px solid var(--border-field);
@@ -79,13 +143,15 @@ a {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
+  transform: translateY(-200%);
+  transition: transform var(--duration-fast) var(--easing-standard);
 }
 
 .skip-link:focus-visible {
-  top: var(--space-2);
+  transform: translateY(0);
 }
 
-/* Cabecera y navegación del sitio. */
+/* Cabecera y navegación del sitio */
 .site-header {
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border-subtle);
@@ -111,10 +177,15 @@ a {
   font-weight: var(--weight-bold);
   font-size: var(--text-lg);
   min-height: 44px;
+  transition: color var(--duration-fast) var(--easing-standard);
+}
+
+.marca:hover {
+  color: var(--accent-primary);
 }
 
 .marca__icono {
-  color: var(--accent-coffee);
+  color: var(--accent-brand);
   flex: none;
 }
 
@@ -140,6 +211,8 @@ a {
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   border: 1px solid transparent;
+  transition: background var(--duration-fast) var(--easing-standard),
+              border-color var(--duration-fast) var(--easing-standard);
 }
 
 .nav-principal a:hover {
@@ -147,17 +220,31 @@ a {
   border-color: var(--border-subtle);
 }
 
-/* Sección visible según IntersectionObserver: acento café, nunca solo color (lleva aria-current). */
+/* Sección visible según IntersectionObserver */
 .nav-principal a[aria-current="location"] {
   color: var(--accent-coffee);
-  text-decoration: underline;
-  text-underline-offset: 4px;
   font-weight: var(--weight-medium);
+  position: relative;
+}
+
+.nav-principal a[aria-current="location"]::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: var(--space-3);
+  right: var(--space-3);
+  height: 2px;
+  background: var(--accent-coffee);
+  border-radius: var(--radius-full);
 }
 
 .seccion {
   padding-block: var(--space-8);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.seccion:first-of-type {
+  padding-top: var(--space-12);
 }
 
 .seccion__cabecera {
@@ -184,7 +271,7 @@ a {
   font-size: var(--text-sm);
 }
 
-/* Toda animación respeta prefers-reduced-motion (§3.8). */
+/* Toda animación respeta prefers-reduced-motion (§3.8) */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

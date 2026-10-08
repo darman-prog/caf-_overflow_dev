@@ -4,8 +4,8 @@
    no opera con dinero (muestra programa como texto informativo fijo). */
 import { api, ApiError } from "../api.js";
 import {
-  badgeNivel, badgePuntos, botonCargando, cop, el, getClienteId,
-  setClienteId, clearClienteId, estadoError, skeletonLinea, toast,
+  abrirRegistro, badgeNivel, badgePuntos, botonCargando, cop, el, getClienteId,
+  setClienteId, clearClienteId, estadoError, skeletonLinea, toast, vaciarCarrito,
 } from "../ui.js";
 
 function stat(dt, valorTexto, clase = "") {
@@ -25,7 +25,7 @@ async function cargar() {
     const vacio = el("div", { clase: "empty" });
     vacio.appendChild(el("p", { texto: "Aún no tienes cuenta. Regístrate para acumular DevPoints." }));
     const btn = el("button", { clase: "btn btn--primary", texto: "Registrarme", attrs: { type: "button" } });
-    btn.addEventListener("click", () => document.getElementById("dialogo-registro")?.showModal());
+    btn.addEventListener("click", () => abrirRegistro());
     vacio.appendChild(btn);
     caja.appendChild(vacio);
     return;
@@ -53,10 +53,13 @@ async function cargar() {
     }));
     const salir = el("button", { clase: "btn btn--ghost", texto: "Cerrar sesión en este equipo", attrs: { type: "button" } });
     salir.addEventListener("click", () => {
-      // Solo olvida el id local; la cuenta sigue existiendo en el servidor.
+      // Cierra la sesión sin dejar rastro: olvida el id, vacía el carrito
+      // (re-renderiza carrito y sticky) y avisa para re-pintar perfil y pedidos.
       clearClienteId();
+      vaciarCarrito();
       toast("Sesión local cerrada.", "info");
       window.dispatchEvent(new CustomEvent("cliente:actualizado"));
+      window.dispatchEvent(new CustomEvent("pedidos:actualizado"));
       cargar();
     });
     card.appendChild(salir);
@@ -74,14 +77,7 @@ async function cargar() {
   }
 }
 
-// Validación solo sintáctica: requeridos y formato de correo.
-function validarRegistro(nombre, correo) {
-  if (!nombre.trim()) return "El nombre es requerido.";
-  if (!correo.trim()) return "El correo es requerido.";
-  // Patrón simple de forma user@dominio.tld; el servidor valida el resto.
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo.trim())) return "Escribe un correo válido, por ejemplo nombre@ejemplo.com.";
-  return null;
-}
+// Mensajes de error junto a cada campo, anunciados vía aria-describedby.
 
 function mostrarErrorCampo(input, mensajeId, mensaje) {
   const mensajeEl = document.getElementById(mensajeId);
@@ -99,15 +95,22 @@ function init() {
   const form = document.getElementById("registro-form");
   const inputNombre = document.getElementById("registro-nombre");
   const inputCorreo = document.getElementById("registro-correo");
-  document.getElementById("abrir-registro")?.addEventListener("click", () => dialogo?.showModal());
+  document.getElementById("abrir-registro")?.addEventListener("click", () => abrirRegistro());
+  document.getElementById("registro-cancelar")?.addEventListener("click", () => {
+    if (dialogo?.open) dialogo.close();
+  });
   window.addEventListener("cliente:actualizado", () => cargar());
 
   form?.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const fallo = validarRegistro(inputNombre.value, inputCorreo.value);
-    mostrarErrorCampo(inputNombre, "registro-nombre-error", !inputNombre.value.trim() ? "El nombre es requerido." : "");
-    mostrarErrorCampo(inputCorreo, "registro-correo-error", inputCorreo.value.trim() && fallo ? fallo : (!inputCorreo.value.trim() ? "El correo es requerido." : ""));
-    if (fallo) {
+    // Validación solo sintáctica y por campo: cada mensaje vive bajo su input.
+    const nombreVacio = !inputNombre.value.trim();
+    const correoVacio = !inputCorreo.value.trim();
+    // Patrón simple de forma user@dominio.tld; el servidor valida el resto.
+    const correoMal = !correoVacio && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputCorreo.value.trim());
+    mostrarErrorCampo(inputNombre, "registro-nombre-error", nombreVacio ? "El nombre es requerido." : "");
+    mostrarErrorCampo(inputCorreo, "registro-correo-error", correoVacio ? "El correo es requerido." : (correoMal ? "Escribe un correo válido, por ejemplo nombre@ejemplo.com." : ""));
+    if (nombreVacio || correoVacio || correoMal) {
       // El foco va al primer campo con error para anunciarlo.
       (!inputNombre.value.trim() ? inputNombre : inputCorreo).focus();
       return;

@@ -215,6 +215,12 @@ export function clearClienteId() {
   localStorage.removeItem(CLAVE_CLIENTE);
 }
 
+// Abre el diálogo de registro una sola vez (showModal falla si ya está abierto).
+export function abrirRegistro() {
+  const dialogo = document.getElementById("dialogo-registro");
+  if (dialogo && !dialogo.open) dialogo.showModal();
+}
+
 // Carrito en localStorage: [{producto_id, cantidad}]. Sin dinero aquí.
 const CLAVE_CARRITO = "cafe_overflow_carrito_v1";
 export function leerCarrito() {

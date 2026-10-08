@@ -1,4 +1,9 @@
-/* components.css — componentes y estados mínimos (DESING.md §5). BEM. */
+/* components.css — componentes y estados mínimos (DESING.md §5). BEM.
+   v1.1: hover excluye disabled, filter entra en la transition de .btn,
+   pulso del pipeline con duración propia (sin parpadeo), fondos de badges y
+   backdrop derivados de tokens con color-mix, terminal-line con token de
+   identidad, y tres mejoras menores (stepper con transition, hover de fila
+   en tabla, cliente-chip sin target de 44px por no ser interactivo). */
 
 /* 5.1 Botones: una acción primaria por vista, altura mínima 44px. */
 .btn {
@@ -16,7 +21,8 @@
   gap: var(--space-2);
   text-decoration: none;
   transition: background var(--duration-fast) var(--easing-standard),
-    border-color var(--duration-fast) var(--easing-standard);
+    border-color var(--duration-fast) var(--easing-standard),
+    filter var(--duration-fast) var(--easing-standard);
 }
 
 .btn--primary {
@@ -24,7 +30,8 @@
   color: var(--text-inverse);
 }
 
-.btn--primary:hover {
+/* :hover excluye disabled: un botón apagado no se ilumina al pasar el mouse. */
+.btn--primary:hover:not(:disabled) {
   filter: brightness(1.08);
 }
 
@@ -34,7 +41,7 @@
   border-color: var(--border-field);
 }
 
-.btn--secondary:hover {
+.btn--secondary:hover:not(:disabled) {
   background: var(--bg-elevated);
 }
 
@@ -44,7 +51,7 @@
   border-color: var(--color-error);
 }
 
-.btn--danger:hover {
+.btn--danger:hover:not(:disabled) {
   background: var(--bg-elevated);
 }
 
@@ -53,7 +60,7 @@
   color: var(--text-main);
 }
 
-.btn--ghost:hover {
+.btn--ghost:hover:not(:disabled) {
   background: var(--bg-elevated);
 }
 
@@ -143,9 +150,10 @@
   border-radius: var(--radius-md);
   font-size: var(--text-lg);
   cursor: pointer;
+  transition: border-color var(--duration-fast) var(--easing-standard);
 }
 
-.stepper__btn:hover {
+.stepper__btn:hover:not(:disabled) {
   border-color: var(--accent-coffee);
 }
 
@@ -206,7 +214,9 @@
   padding-top: var(--space-2);
 }
 
-/* 5.6 Badges: pill 12px mono, texto siempre explícito. */
+/* 5.6 Badges: pill 12px mono, texto siempre explícito.
+   Los fondos se derivan del token con color-mix: si el token cambia,
+   el tinte del badge lo sigue (antes era RGBA hardcodeado). */
 .badge {
   display: inline-flex;
   align-items: center;
@@ -224,43 +234,43 @@
 .badge--pendiente {
   color: var(--st-pendiente);
   border-color: var(--st-pendiente);
-  background: rgba(210, 153, 34, 0.15);
+  background: color-mix(in srgb, var(--st-pendiente) 15%, transparent);
 }
 
 .badge--preparacion {
   color: var(--st-preparacion);
   border-color: var(--st-preparacion);
-  background: rgba(88, 166, 255, 0.15);
+  background: color-mix(in srgb, var(--st-preparacion) 15%, transparent);
 }
 
 .badge--listo {
   color: var(--st-listo);
   border-color: var(--st-listo);
-  background: rgba(63, 185, 80, 0.15);
+  background: color-mix(in srgb, var(--st-listo) 15%, transparent);
 }
 
 .badge--entregado {
   color: var(--st-entregado);
   border-color: var(--st-entregado);
-  background: rgba(139, 148, 158, 0.15);
+  background: color-mix(in srgb, var(--st-entregado) 15%, transparent);
 }
 
 .badge--stock-ok {
   color: var(--color-success);
   border-color: var(--color-success);
-  background: rgba(63, 185, 80, 0.15);
+  background: color-mix(in srgb, var(--color-success) 15%, transparent);
 }
 
 .badge--stock-bajo {
   color: var(--color-warning);
   border-color: var(--color-warning);
-  background: rgba(210, 153, 34, 0.15);
+  background: color-mix(in srgb, var(--color-warning) 15%, transparent);
 }
 
 .badge--stock-agotado {
   color: var(--color-error);
   border-color: var(--color-error);
-  background: rgba(248, 81, 73, 0.15);
+  background: color-mix(in srgb, var(--color-error) 15%, transparent);
 }
 
 .badge--junior {
@@ -272,19 +282,19 @@
 .badge--mid {
   color: var(--color-info);
   border-color: var(--color-info);
-  background: rgba(88, 166, 255, 0.15);
+  background: color-mix(in srgb, var(--color-info) 15%, transparent);
 }
 
 .badge--senior {
   color: var(--accent-coffee);
   border-color: var(--accent-coffee);
-  background: rgba(249, 115, 22, 0.15);
+  background: color-mix(in srgb, var(--accent-coffee) 15%, transparent);
 }
 
 .badge--puntos {
   color: var(--color-loyalty);
   border-color: var(--color-loyalty);
-  background: rgba(188, 140, 255, 0.15);
+  background: color-mix(in srgb, var(--color-loyalty) 15%, transparent);
 }
 
 /* 5.7 Pipeline de estado: 4 pasos con conectores tipo tubería. */
@@ -325,27 +335,28 @@
   background: var(--color-success);
 }
 
-/* El paso activo late sutil; sin pulso con reduced-motion. */
+/* El paso activo late sutil con duración propia (1.4s, no parpadeo);
+   la animación vive una sola vez acá y el media query global de
+   prefers-reduced-motion la desactiva. */
 .pipeline__paso--activo {
   font-weight: var(--weight-bold);
+  animation: pulso var(--duration-pulse) var(--easing-standard) infinite alternate;
 }
 
+/* Cada estado solo aporta color y borde; la animación no se repite. */
 .pipeline__paso--activo[data-estado="PENDIENTE_DE_PAGO"] {
   color: var(--st-pendiente);
   border-color: var(--st-pendiente);
-  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
 }
 
 .pipeline__paso--activo[data-estado="EN_PREPARACION"] {
   color: var(--st-preparacion);
   border-color: var(--st-preparacion);
-  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
 }
 
 .pipeline__paso--activo[data-estado="LISTO"] {
   color: var(--st-listo);
   border-color: var(--st-listo);
-  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
 }
 
 @keyframes pulso {
@@ -401,7 +412,7 @@
   pointer-events: none;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 640px) { /* bp-md = --bp-md */
   .toasts {
     left: auto;
     width: min(22rem, calc(100vw - 2rem));
@@ -476,10 +487,11 @@
   background: var(--bg-surface);
 }
 
+/* Identidad terminal: usa el token decorativo, no el semántico de éxito. */
 .terminal-line {
   font-family: var(--font-mono);
   font-size: var(--text-sm);
-  color: var(--color-success);
+  color: var(--accent-terminal, var(--color-success));
 }
 
 /* Barra sticky móvil del carrito (§5.5, z-index 10). */
@@ -512,8 +524,9 @@
   max-width: min(26rem, calc(100vw - 2rem));
 }
 
+/* Backdrop derivado del token de fondo: si --bg-base cambia, el velo lo sigue. */
 .dialogo::backdrop {
-  background: rgba(13, 17, 23, 0.7);
+  background: color-mix(in srgb, var(--bg-base) 70%, transparent);
 }
 
 /* Tabla de pedidos (desktop). */
@@ -534,6 +547,15 @@
   font-weight: var(--weight-medium);
 }
 
+/* Hover de fila: ayuda a seguir la línea en tablas anchas. */
+.tabla tbody tr {
+  transition: background var(--duration-fast) var(--easing-standard);
+}
+
+.tabla tbody tr:hover {
+  background: var(--bg-elevated);
+}
+
 /* Tarjeta de pedido (móvil). */
 .pedido-card {
   background: var(--bg-surface);
@@ -551,7 +573,7 @@
   margin-bottom: var(--space-2);
 }
 
-/* Chip de cliente en cabecera. */
+/* Chip de cliente en cabecera. No es interactivo: no requiere target de 44px. */
 .cliente-chip {
   display: inline-flex;
   align-items: center;
@@ -561,5 +583,5 @@
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-full);
   padding: var(--space-1) var(--space-3);
-  min-height: 44px;
+  min-height: 2rem;
 }

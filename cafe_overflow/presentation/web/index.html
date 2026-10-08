@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Café Overflow: pide tu café, canjea DevPoints y sigue tus pedidos.">
-  <title>Café Overflow · Dev &amp; Coffee Lounge</title>
+  <title>Café Overflow · Dev & Coffee Lounge</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2'%3E%3Cpath d='M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9z'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/base.css">
@@ -20,7 +20,7 @@
         <span class="marca__icono" aria-hidden="true">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2"/><path d="M7 5c0-1 1-1 1-2M11 5c0-1 1-1 1-2"/></svg>
         </span>
-        <span>Café Overflow <span class="marca__tag">Dev &amp; Coffee Lounge</span></span>
+        <span>Café Overflow <span class="marca__tag">Dev & Coffee Lounge</span></span>
       </a>
       <nav class="nav-principal" aria-label="Navegación principal">
         <a href="#seccion-menu">Menú</a>
@@ -34,7 +34,9 @@
   </header>
 
   <main class="contenedor" id="contenido">
-    <h1>Café Overflow</h1>
+    <!-- H1 oculto visualmente pero presente para SEO y screen readers -->
+    <h1 class="sr-only">Café Overflow · Dev & Coffee Lounge</h1>
+    
     <p class="texto-secundario">Pide tu café, canjea DevPoints y sigue tu pedido por el pipeline.</p>
 
     <section class="seccion" id="seccion-menu" aria-labelledby="titulo-menu">
@@ -84,7 +86,7 @@
       </div>
       <div id="pedidos-estado" aria-live="polite"></div>
       <div class="pedidos-cards" id="pedidos-cards"></div>
-      <div class="pedidos-tabla">
+      <div class="pedidos-tabla" tabindex="0" role="region" aria-label="Tabla de pedidos">
         <table class="tabla">
           <caption class="texto-secundario">Tus pedidos con estado y total</caption>
           <thead>
@@ -127,7 +129,7 @@
       </div>
       <p>
         <button class="btn btn--primary" id="registro-enviar" type="submit">Registrarme</button>
-        <button class="btn btn--ghost" type="button" onclick="document.getElementById('dialogo-registro').close()">Cancelar</button>
+        <button class="btn btn--ghost" id="registro-cancelar" type="button">Cancelar</button>
       </p>
     </form>
   </dialog>
@@ -135,10 +137,7 @@
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <noscript><p class="contenedor">Esta aplicación necesita JavaScript para pedir y ver tus pedidos.</p></noscript>
 
-  <script type="module" src="js/vistas/menu.js"></script>
-  <script type="module" src="js/vistas/carrito.js"></script>
-  <script type="module" src="js/vistas/pedidos.js"></script>
-  <script type="module" src="js/vistas/perfil.js"></script>
-  <script type="module" src="js/vistas/nav.js"></script>
+  <!-- Consolidado en main.js -->
+  <script type="module" src="js/main.js"></script>
 </body>
 </html>
