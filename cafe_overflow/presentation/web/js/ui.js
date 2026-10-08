@@ -140,13 +140,15 @@ export function skeletonLinea(textoVisible) {
   return caja;
 }
 
-// Vacío: icono + frase corta + CTA con callback.
-export function estadoVacio({ titulo, accionTexto, alAccion }) {
+// Vacío: icono + frase corta + línea secundaria opcional + CTA con callback.
+export function estadoVacio({ titulo, subtitulo, accionTexto, alAccion }) {
   const caja = el("div", { clase: "empty" });
   const iconoCaja = el("div", { clase: "empty__icono" });
   iconoCaja.appendChild(icono("taza", { size: 20 }));
   caja.appendChild(iconoCaja);
   caja.appendChild(el("p", { texto: titulo }));
+  // Segunda línea tenue que aclara el flujo sin robar jerarquía al título.
+  if (subtitulo) caja.appendChild(el("p", { clase: "texto-secundario", texto: subtitulo }));
   if (accionTexto && alAccion) {
     const btn = el("button", { clase: "btn btn--secondary", texto: accionTexto, attrs: { type: "button" } });
     btn.addEventListener("click", alAccion);

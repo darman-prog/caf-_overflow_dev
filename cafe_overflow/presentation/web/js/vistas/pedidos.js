@@ -89,7 +89,8 @@ async function cargar() {
     if (mios.length === 0) {
       estado.appendChild(
         estadoVacio({
-          titulo: "Aún no tienes pedidos. Explora el menú.",
+          titulo: "Aún no tienes pedidos.",
+          subtitulo: "Lo que agregas al carrito aparece aquí al confirmar el pedido.",
           accionTexto: "Ver menú",
           alAccion: () => document.getElementById("seccion-menu")?.scrollIntoView(),
         })
