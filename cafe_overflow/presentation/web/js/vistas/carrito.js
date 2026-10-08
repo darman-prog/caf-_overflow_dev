@@ -114,7 +114,12 @@ async function pintarDisponibles() {
   const ayuda = document.getElementById("devpoints-ayuda");
   const clienteId = getClienteId();
   if (!clienteId) {
-    ayuda.textContent = "Regístrate para canjear DevPoints.";
+    // CTA inline: abre el mismo diálogo de registro, sin duplicar lógica.
+    ayuda.textContent = "";
+    ayuda.appendChild(el("span", { texto: "Regístrate para canjear DevPoints. " }));
+    const registrar = el("button", { clase: "btn btn--ghost", texto: "Registrarme", attrs: { type: "button" } });
+    registrar.addEventListener("click", () => abrirRegistro());
+    ayuda.appendChild(registrar);
     return;
   }
   try {
