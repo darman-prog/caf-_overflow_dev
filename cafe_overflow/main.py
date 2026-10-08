@@ -17,7 +17,7 @@ from persistencia.sqlite_dao import (
     SqlitePedidoDAO,
     SqliteProductoDAO,
 )
-from presentation.api.servidor import Controladores, iniciar_servidor
+from presentation.api.servidor import Controladores, crear_servidor
 
 RAIZ = Path(__file__).resolve().parent
 RUTA_BD = RAIZ / "cafe_overflow.db"
@@ -28,7 +28,6 @@ def inicializar_bd(ruta_bd, reiniciar=False):
     """Crea el esquema y carga los datos iniciales si la base no existe."""
     ruta_bd = Path(ruta_bd)
     if reiniciar and ruta_bd.exists():
-        # Reinicio explícito para desarrollo: borra la base anterior.
         ruta_bd.unlink()
     if ruta_bd.exists():
         return False
@@ -68,11 +67,22 @@ def main(argumentos=None):
     )
     parser.add_argument("--puerto", type=int, default=PUERTO)
     args = parser.parse_args(argumentos)
+    
     creada = inicializar_bd(RUTA_BD, reiniciar=args.reiniciar)
     print(f"Base de datos {'creada' if creada else 'existente'}: {RUTA_BD}")
+    
     controladores = construir_controladores(RUTA_BD)
-    print(f"Sirviendo en http://127.0.0.1:{args.puerto}")
-    iniciar_servidor(controladores, "127.0.0.1", args.puerto)
+    servidor = crear_servidor(controladores, "127.0.0.1", args.puerto)
+    
+    print(f"Sirviendo en http://127.0.0.1:{args.puerto} — Ctrl+C para detener")
+    try:
+        servidor.serve_forever()
+    except KeyboardInterrupt:
+        print("\nDeteniendo servidor…")
+    finally:
+        servidor.shutdown()
+        servidor.server_close()
+    print("Servidor detenido.")
 
 
 if __name__ == "__main__":
