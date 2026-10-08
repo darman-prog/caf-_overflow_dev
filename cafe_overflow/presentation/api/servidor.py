@@ -31,6 +31,7 @@ from negocio.servicios.lealtad import ServicioLealtad
 from negocio.servicios.pedidos import ServicioPedidos
 from negocio.servicios.precios import ServicioPrecios
 from presentation.validacion import (
+    ErrorValidacion,
     exigir_correo,
     exigir_entero_no_negativo,
     exigir_entero_positivo,
@@ -39,6 +40,13 @@ from presentation.validacion import (
 
 # Carpeta con la aplicación web (se sirve tal cual, sin plantillas).
 DIR_WEB = Path(__file__).resolve().parents[1] / "web"
+
+# Tope del cuerpo aceptado para no leer cargas abusivas en memoria.
+MAX_CUERPO = 1_000_000
+
+
+class CuerpoDemasiadoGrandeError(Exception):
+    """El cuerpo supera el tope aceptado por la API."""
 
 # Dominio -> (estado HTTP, código público). Toda la API usa este mapa.
 MAPA_ERRORES = {
@@ -134,7 +142,7 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
 
     def do_HEAD(self):
         if urlparse(self.path).path.startswith("/api/"):
-            self._responder(404, _error("NO_ENCONTRADO", "recurso no encontrado"))
+            self._despachar("HEAD")
         else:
             super().do_HEAD()
 
@@ -159,13 +167,17 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
         partes = urlparse(self.path)
         # parse_qs ignora parámetros vacíos; si se repite, vale el primero.
         consulta = {k: v[0] for k, v in parse_qs(partes.query).items()}
-        cuerpo = self._leer_cuerpo() if metodo in ("POST", "PATCH") else {}
+        # HEAD se atiende como GET pero sin escribir cuerpo en la respuesta.
+        metodo_efectivo = "GET" if metodo == "HEAD" else metodo
         try:
+            cuerpo = self._leer_cuerpo() if metodo in ("POST", "PATCH") else {}
             if not isinstance(cuerpo, dict):
-                raise ValueError("el cuerpo debe ser un objeto JSON")
-            estado, carga = self._enrutar(metodo, partes.path, consulta, cuerpo)
-        except ValueError as error:
+                raise ErrorValidacion("el cuerpo debe ser un objeto JSON")
+            estado, carga = self._enrutar(metodo_efectivo, partes.path, consulta, cuerpo)
+        except ErrorValidacion as error:
             estado, carga = 400, _error("ENTRADA_INVALIDA", str(error))
+        except CuerpoDemasiadoGrandeError as error:
+            estado, carga = 413, _error("CUERPO_DEMASIADO_GRANDE", str(error))
         except ErrorDominio as error:
             estado, codigo = MAPA_ERRORES.get(type(error), (500, "ERROR_DOMINIO"))
             carga = _error(codigo, str(error))
@@ -177,23 +189,38 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
             estado, carga = 500, _error(
                 "ERROR_INTERNO", "error inesperado del servidor"
             )
-        self._responder(estado, carga)
+        self._responder(estado, carga, incluir_cuerpo=(metodo != "HEAD"))
 
     def _leer_cuerpo(self):
-        longitud = int(self.headers.get("Content-Length") or 0)
+        try:
+            longitud = int(self.headers.get("Content-Length") or 0)
+        except ValueError:
+            raise ErrorValidacion("la longitud del cuerpo no es válida")
+        if longitud > MAX_CUERPO:
+            raise CuerpoDemasiadoGrandeError(
+                "el cuerpo supera el tamaño máximo aceptado"
+            )
         if longitud == 0:
             return {}
-        datos = self.rfile.read(longitud).decode("utf-8")
-        # Un JSON malformado es entrada inválida (400), no error interno.
-        return json.loads(datos)
+        try:
+            datos = self.rfile.read(longitud).decode("utf-8")
+        except UnicodeDecodeError:
+            raise ErrorValidacion("el cuerpo no es texto UTF-8 válido")
+        try:
+            # Un JSON malformado es entrada inválida (400), no error interno.
+            return json.loads(datos)
+        except json.JSONDecodeError as error:
+            raise ErrorValidacion(f"el cuerpo no es JSON válido: {error}") from error
 
-    def _responder(self, estado, carga):
+    def _responder(self, estado, carga, incluir_cuerpo=True):
         cuerpo = json.dumps(carga, ensure_ascii=False).encode("utf-8")
         self.send_response(estado)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(cuerpo)))
         self.end_headers()
-        self.wfile.write(cuerpo)
+        # En HEAD se envían solo los encabezados, con la longitud del GET.
+        if incluir_cuerpo:
+            self.wfile.write(cuerpo)
 
     def _enrutar(self, metodo, ruta, consulta, cuerpo):
         c = self.controladores
@@ -220,20 +247,16 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
             nombre = consulta.get("estado")
             estado = None
             if nombre is not None:
-                if nombre not in (
-                    "PENDIENTE_DE_PAGO",
-                    "EN_PREPARACION",
-                    "LISTO",
-                    "ENTREGADO",
-                ):
-                    raise ValueError("estado de pedido inválido")
-                estado = EstadoPedido(nombre)
+                try:
+                    estado = EstadoPedido[nombre]
+                except KeyError:
+                    raise ErrorValidacion("estado de pedido inválido") from None
             crudo_cliente = consulta.get("cliente_id")
             cliente_id = None
             if crudo_cliente is not None:
                 # El filtro llega como texto en la URL; debe ser entero positivo.
                 if not crudo_cliente.isdigit() or int(crudo_cliente) < 1:
-                    raise ValueError("cliente_id inválido")
+                    raise ErrorValidacion("cliente_id inválido")
                 cliente_id = int(crudo_cliente)
             return 200, [pedido_a_json(p) for p in c.pedidos.listar_pedidos(estado, cliente_id)]
         coincidencia = re.fullmatch(r"/api/pedidos/(\d+)", ruta)
@@ -249,7 +272,7 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
             pedido_id = int(coincidencia.group(1))
             valor = cuerpo.get("estado")
             if valor not in ("LISTO", "ENTREGADO"):
-                raise ValueError("el campo estado debe ser LISTO o ENTREGADO")
+                raise ErrorValidacion("el campo estado debe ser LISTO o ENTREGADO")
             # ENTREGADO acredita la compra en lealtad; no es un simple avance.
             if valor == "ENTREGADO":
                 pedido = c.pedidos.entregar(pedido_id)
@@ -264,11 +287,11 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
         crudo = cuerpo.get("items")
         # La lista de ítems es requerida y no puede venir vacía.
         if not isinstance(crudo, list) or not crudo:
-            raise ValueError("el campo items es requerido y no puede estar vacío")
+            raise ErrorValidacion("el campo items es requerido y no puede estar vacío")
         renglones = []
         for renglon in crudo:
             if not isinstance(renglon, dict):
-                raise ValueError("cada ítem debe traer producto_id y cantidad")
+                raise ErrorValidacion("cada ítem debe traer producto_id y cantidad")
             producto_id = exigir_entero_positivo(
                 renglon.get("producto_id"), "producto_id"
             )
@@ -277,7 +300,7 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
         # Sin productos repetidos (el servicio lo vuelve a validar).
         ids = [producto_id for producto_id, _ in renglones]
         if len(set(ids)) != len(ids):
-            raise ValueError("el pedido no puede repetir productos")
+            raise ErrorValidacion("el pedido no puede repetir productos")
         canje = exigir_entero_no_negativo(
             cuerpo.get("devpoints_a_canjear", 0), "devpoints_a_canjear"
         )
@@ -288,6 +311,7 @@ def crear_servidor(
     controladores, anfitrion="127.0.0.1", puerto=8000, directorio_web=DIR_WEB
 ):
     """Crea el servidor de hilos con los servicios inyectados (sin arrancar)."""
+    # Seguro con hilos: los servicios no guardan estado mutable y cada DAO abre su propia conexión por operación.
     manejador = partial(
         ManejadorCafe, controladores=controladores, directorio_web=directorio_web
     )

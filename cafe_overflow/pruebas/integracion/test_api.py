@@ -1,5 +1,6 @@
 """Pruebas de integración de la API HTTP con base temporal en archivo."""
 
+import http.client
 import json
 import sqlite3
 import tempfile
@@ -8,6 +9,7 @@ import unittest
 import urllib.error
 import urllib.request
 from pathlib import Path
+from unittest.mock import patch
 
 from main import inicializar_bd
 from negocio.servicios.catalogo import ServicioCatalogo
@@ -19,7 +21,7 @@ from persistencia.sqlite_dao import (
     SqlitePedidoDAO,
     SqliteProductoDAO,
 )
-from presentation.api.servidor import Controladores, crear_servidor
+from presentation.api.servidor import MAX_CUERPO, Controladores, crear_servidor
 
 RAIZ = Path(__file__).resolve().parents[2]
 
@@ -322,6 +324,89 @@ class TestFiltroCliente(BaseAPI):
     def test_filtro_invalido_es_400(self):
         estado, _ = self.pedir("GET", "/api/pedidos?cliente_id=mal")
         self.assertEqual(estado, 400)
+
+
+class TestRobustezAPI(BaseAPI):
+    def test_head_sin_cuerpo_con_misma_longitud(self):
+        # El GET deja la referencia de longitud para comparar con el HEAD.
+        estado, menu = self.pedir("GET", "/api/productos")
+        self.assertEqual(estado, 200)
+        referencia = json.dumps(menu, ensure_ascii=False).encode("utf-8")
+        anfitrion, puerto = self.base.replace("http://", "").split(":")
+        conexion = http.client.HTTPConnection(anfitrion, int(puerto), timeout=5)
+        try:
+            conexion.request("HEAD", "/api/productos")
+            respuesta = conexion.getresponse()
+            cuerpo = respuesta.read()
+        finally:
+            conexion.close()
+        self.assertEqual(respuesta.status, 200)
+        self.assertEqual(cuerpo, b"")
+        self.assertEqual(int(respuesta.getheader("Content-Length")), len(referencia))
+
+    def test_cuerpo_demasiado_grande_es_413(self):
+        grande = "x" * (MAX_CUERPO + 1)
+        datos = grande.encode("utf-8")
+        anfitrion, puerto = self.base.replace("http://", "").split(":")
+        conexion = http.client.HTTPConnection(anfitrion, int(puerto), timeout=5)
+        try:
+            conexion.request(
+                "POST",
+                "/api/clientes",
+                body=datos,
+                headers={"Content-Type": "application/json"},
+            )
+            respuesta = conexion.getresponse()
+            estado = respuesta.status
+            cuerpo = json.loads(respuesta.read().decode("utf-8"))
+        finally:
+            conexion.close()
+        self.assertEqual(estado, 413)
+        self.assertEqual(cuerpo["error"]["codigo"], "CUERPO_DEMASIADO_GRANDE")
+
+    def test_json_malformado_es_400(self):
+        anfitrion, puerto = self.base.replace("http://", "").split(":")
+        conexion = http.client.HTTPConnection(anfitrion, int(puerto), timeout=5)
+        try:
+            conexion.request(
+                "POST",
+                "/api/clientes",
+                body=b"{no-valido",
+                headers={"Content-Type": "application/json"},
+            )
+            respuesta = conexion.getresponse()
+            estado = respuesta.status
+            cuerpo = json.loads(respuesta.read().decode("utf-8"))
+        finally:
+            conexion.close()
+        self.assertEqual(estado, 400)
+        self.assertEqual(cuerpo["error"]["codigo"], "ENTRADA_INVALIDA")
+
+    def test_valueerror_crudo_es_500(self):
+        # Un ValueError fuera de validación no debe exponerse como 400.
+        with patch(
+            "presentation.api.servidor.ServicioCatalogo.listar_menu",
+            side_effect=ValueError("fallo interno"),
+        ):
+            estado, cuerpo = self.pedir("GET", "/api/productos")
+        self.assertEqual(estado, 500)
+        self.assertEqual(cuerpo["error"]["codigo"], "ERROR_INTERNO")
+
+    def test_filtro_estado_invalido_y_valido(self):
+        estado, _ = self.pedir("GET", "/api/pedidos?estado=INVENTADO")
+        self.assertEqual(estado, 400)
+        cliente_id = self.nuevo_cliente("estado@example.com")
+        self.pedir(
+            "POST",
+            "/api/pedidos",
+            {"cliente_id": cliente_id, "items": [{"producto_id": 1, "cantidad": 1}]},
+        )
+        estado, filtrados = self.pedir("GET", "/api/pedidos?estado=PENDIENTE_DE_PAGO")
+        self.assertEqual(estado, 200)
+        self.assertTrue(all(p["estado"] == "PENDIENTE_DE_PAGO" for p in filtrados))
+        estado, vacios = self.pedir("GET", "/api/pedidos?estado=LISTO")
+        self.assertEqual(estado, 200)
+        self.assertEqual(vacios, [])
 
 
 class TestArranque(unittest.TestCase):
