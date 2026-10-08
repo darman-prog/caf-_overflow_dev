@@ -214,7 +214,7 @@
   padding-top: var(--space-2);
 }
 
-/* 5.6 Badges: pill 12px mono, texto siempre explícito.
+/* 5.6 Badges: pill 13px/600 mono, texto siempre explícito.
    Los fondos se derivan del token con color-mix: si el token cambia,
    el tinte del badge lo sigue (antes era RGBA hardcodeado). */
 .badge {
@@ -222,7 +222,8 @@
   align-items: center;
   gap: var(--space-1);
   font-family: var(--font-mono);
-  font-size: var(--text-xs);
+  font-size: 0.8125rem;
+  font-weight: var(--weight-medium);
   letter-spacing: 0.02em;
   border-radius: var(--radius-sm);
   border: 1px solid;
