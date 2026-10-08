@@ -9,6 +9,7 @@ Aplicación web de pedidos en línea para un café temático de desarrolladores,
 - `persistencia/` — esquema SQL, datos iniciales 100% ficticios e implementación SQLite de los puertos.
 - `pruebas/` — unitarias de negocio con DAO falsos en memoria (`negocio/`), integración con SQLite temporal (`persistencia/`) e integración HTTP (`integracion/`).
 - `main.py` — punto de entrada; único módulo que conecta las tres capas.
+- `presentation/web/img/producto-<id>.png` — fotos de los productos según el orden de las semillas (aportadas por el equipo); la tarjeta las muestra con `alt` y degradado si falta alguna.
 
 ## Cómo ejecutar
 
