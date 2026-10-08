@@ -4,6 +4,18 @@ from negocio.entidades import Producto
 from negocio.excepciones import ProductoNoEncontradoError
 from negocio.puertos import ProductoDAO
 
+# Stock igual o inferior a este umbral se muestra como "bajo" en la UI (P-2).
+UMBRAL_STOCK_BAJO = 5
+
+
+def disponibilidad_stock(stock: int) -> str:
+    """Clasifica el stock para su exhibición: disponible, bajo o agotado."""
+    if stock <= 0:
+        return "agotado"
+    if stock <= UMBRAL_STOCK_BAJO:
+        return "bajo"
+    return "disponible"
+
 
 class ServicioCatalogo:
     """Consulta los productos a través del DAO, sin reglas de negocio."""

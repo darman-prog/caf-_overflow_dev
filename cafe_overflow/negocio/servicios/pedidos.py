@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from negocio.entidades import ItemPedido, Pedido
+from negocio.entidades import Cliente, ItemPedido, Pedido, Totales
 from negocio.enums import EstadoPedido
 from negocio.excepciones import (
     ClienteNoEncontradoError,
@@ -45,6 +45,34 @@ class ServicioPedidos:
         Cada renglón es una tupla (producto_id, cantidad). El precio de cada
         renglón es el vigente al momento del pedido.
         """
+        cliente, pedido, _totales = self._preparar(
+            cliente_id, renglones, devpoints_a_canjear
+        )
+        # Los puntos canjeados se descuentan del saldo al registrar (S-6).
+        self._lealtad.aplicar_canje(cliente, devpoints_a_canjear)
+        # La persistencia descuenta stock y puntos en la misma transacción (S-7).
+        return self._pedidos.registrar_pedido_completo(pedido, cliente)
+
+    def vista_previa(
+        self,
+        cliente_id: int,
+        renglones: list[tuple[int, int]],
+        devpoints_a_canjear: int = 0,
+    ) -> Totales:
+        """Calcula el desglose sin persistir nada; la UI solo lo muestra."""
+        # Valida igual que el registro para que la vista previa sea fiel.
+        _cliente, _pedido, totales = self._preparar(
+            cliente_id, renglones, devpoints_a_canjear
+        )
+        return totales
+
+    def _preparar(
+        self,
+        cliente_id: int,
+        renglones: list[tuple[int, int]],
+        devpoints_a_canjear: int,
+    ) -> tuple[Cliente, Pedido, Totales]:
+        """Valida y calcula; devuelve cliente, pedido sin persistir y totales."""
         cliente = self._clientes.obtener_por_id(cliente_id)
         if cliente is None:
             raise ClienteNoEncontradoError("el cliente no existe")
@@ -80,8 +108,6 @@ class ServicioPedidos:
         totales = self._precios.calcular_totales(
             items, cliente.nivel, cliente.devpoints, devpoints_a_canjear
         )
-        # Los puntos canjeados se descuentan del saldo al registrar (S-6).
-        self._lealtad.aplicar_canje(cliente, devpoints_a_canjear)
         pedido = Pedido(
             id=None,
             cliente_id=cliente_id,
@@ -91,8 +117,7 @@ class ServicioPedidos:
             devpoints_canjeados=devpoints_a_canjear,
             fecha=datetime.now(),
         )
-        # La persistencia descuenta stock y puntos en la misma transacción (S-7).
-        return self._pedidos.registrar_pedido_completo(pedido, cliente)
+        return cliente, pedido, totales
 
     def confirmar_pago(self, pedido_id: int) -> Pedido:
         """El personal confirma el pago: Pendiente de pago a En preparación (S-9)."""

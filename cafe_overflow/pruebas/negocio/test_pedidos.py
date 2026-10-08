@@ -14,7 +14,7 @@ from negocio.excepciones import (
     StockInsuficienteError,
     TransicionEstadoInvalidaError,
 )
-from negocio.servicios.catalogo import ServicioCatalogo
+from negocio.servicios.catalogo import ServicioCatalogo, disponibilidad_stock
 from negocio.servicios.lealtad import ServicioLealtad
 from negocio.servicios.pedidos import ServicioPedidos
 from negocio.servicios.precios import ServicioPrecios
@@ -233,6 +233,14 @@ class TestCatalogo(BasePedidos):
     def test_producto_inexistente_se_rechaza(self):
         with self.assertRaises(ProductoNoEncontradoError):
             self.catalogo.obtener_producto(999)
+
+
+class TestDisponibilidad(unittest.TestCase):
+    def test_clasifica_stock_para_exhibicion(self):
+        self.assertEqual(disponibilidad_stock(50), "disponible")
+        self.assertEqual(disponibilidad_stock(5), "bajo")
+        self.assertEqual(disponibilidad_stock(1), "bajo")
+        self.assertEqual(disponibilidad_stock(0), "agotado")
 
 
 if __name__ == "__main__":
