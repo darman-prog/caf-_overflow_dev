@@ -52,6 +52,24 @@ a[href^="#"] {
   scroll-behavior: smooth;
 }
 
+/* El header es sticky: reserva su altura para que cada ancla caiga en su
+   sección y el título no quede tapado (el header envuelve más filas en móvil). */
+html {
+  scroll-padding-top: 12rem;
+}
+
+@media (min-width: 640px) {
+  html {
+    scroll-padding-top: 8rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    scroll-padding-top: 5.5rem;
+  }
+}
+
 /* Foco solo con teclado, según §3.8 */
 :focus-visible {
   outline: var(--focus-ring);

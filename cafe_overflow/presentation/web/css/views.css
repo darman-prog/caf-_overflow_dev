@@ -165,18 +165,13 @@
   font-size: var(--text-lg);
 }
 
-/* Personal: kanban en desktop, lista apilada + filtro bajo 1024px. */
+/* Personal: kanban en desktop, lista apilada bajo 1024px. */
 .personal-controles {
   display: flex;
   gap: var(--space-3);
   flex-wrap: wrap;
   align-items: end;
   margin-bottom: var(--space-4);
-}
-
-.personal-controles .field {
-  margin-bottom: 0;
-  min-width: min(16rem, 100%);
 }
 
 .personal-board {
@@ -219,11 +214,6 @@
   .personal-board {
     grid-template-columns: repeat(4, 1fr);
     align-items: start;
-  }
-
-  /* En desktop el filtro no limita columnas: todas visibles. */
-  .personal-columna[hidden] {
-    display: block;
   }
 
   /* Columna vacía no colapsa: el tablero mantiene la lectura de 4 pistas. */
