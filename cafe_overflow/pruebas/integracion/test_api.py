@@ -21,7 +21,7 @@ from persistencia.sqlite_dao import (
     SqlitePedidoDAO,
     SqliteProductoDAO,
 )
-from presentation.api.servidor import MAX_CUERPO, Controladores, crear_servidor
+from presentacion.api.servidor import MAX_CUERPO, Controladores, crear_servidor
 
 RAIZ = Path(__file__).resolve().parents[2]
 
@@ -385,7 +385,7 @@ class TestRobustezAPI(BaseAPI):
     def test_valueerror_crudo_es_500(self):
         # Un ValueError fuera de validación no debe exponerse como 400.
         with patch(
-            "presentation.api.servidor.ServicioCatalogo.listar_menu",
+            "presentacion.api.servidor.ServicioCatalogo.listar_menu",
             side_effect=ValueError("fallo interno"),
         ):
             estado, cuerpo = self.pedir("GET", "/api/productos")

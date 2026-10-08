@@ -30,7 +30,7 @@ from negocio.servicios.catalogo import ServicioCatalogo, disponibilidad_stock
 from negocio.servicios.lealtad import ServicioLealtad
 from negocio.servicios.pedidos import ServicioPedidos
 from negocio.servicios.precios import ServicioPrecios
-from presentation.validacion import (
+from presentacion.validacion import (
     ErrorValidacion,
     exigir_correo,
     exigir_entero_no_negativo,

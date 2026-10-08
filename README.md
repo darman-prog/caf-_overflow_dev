@@ -4,7 +4,7 @@ Aplicación web de pedidos en línea para un café temático de desarrolladores,
 
 ## Estructura por capas
 
-- `cafe_overflow/presentation/` — aplicación web (HTML/CSS/JS) y controladores HTTP/JSON.
+- `cafe_overflow/presentacion/` — aplicación web (HTML/CSS/JS) y controladores HTTP/JSON.
 - `cafe_overflow/negocio/` — entidades, servicios y puertos DAO con las reglas de negocio.
 - `cafe_overflow/persistencia/` — esquema SQL, datos iniciales e implementación SQLite.
 - `cafe_overflow/main.py` — punto de entrada que conecta las tres capas.
