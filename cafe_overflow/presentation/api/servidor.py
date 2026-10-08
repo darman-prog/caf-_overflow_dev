@@ -228,7 +228,14 @@ class ManejadorCafe(SimpleHTTPRequestHandler):
                 ):
                     raise ValueError("estado de pedido inválido")
                 estado = EstadoPedido(nombre)
-            return 200, [pedido_a_json(p) for p in c.pedidos.listar_pedidos(estado)]
+            crudo_cliente = consulta.get("cliente_id")
+            cliente_id = None
+            if crudo_cliente is not None:
+                # El filtro llega como texto en la URL; debe ser entero positivo.
+                if not crudo_cliente.isdigit() or int(crudo_cliente) < 1:
+                    raise ValueError("cliente_id inválido")
+                cliente_id = int(crudo_cliente)
+            return 200, [pedido_a_json(p) for p in c.pedidos.listar_pedidos(estado, cliente_id)]
         coincidencia = re.fullmatch(r"/api/pedidos/(\d+)", ruta)
         if metodo == "GET" and coincidencia:
             pedido = c.pedidos.obtener_pedido(int(coincidencia.group(1)))

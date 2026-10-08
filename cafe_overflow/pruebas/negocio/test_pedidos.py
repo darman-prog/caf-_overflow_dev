@@ -243,5 +243,24 @@ class TestDisponibilidad(unittest.TestCase):
         self.assertEqual(disponibilidad_stock(0), "agotado")
 
 
+class TestListarPorCliente(BasePedidos):
+    def test_listar_filtra_por_cliente(self):
+        otro = self.lealtad.registrar_cliente("Grace", "grace@example.com")
+        self.pedidos.registrar_pedido(self.cliente.id, [(self.cafe.id, 1)], 0)
+        self.pedidos.registrar_pedido(otro.id, [(self.te.id, 1)], 0)
+        mios = self.pedidos.listar_pedidos(cliente_id=self.cliente.id)
+        self.assertEqual(len(mios), 1)
+        self.assertEqual(mios[0].cliente_id, self.cliente.id)
+        self.assertEqual(len(self.pedidos.listar_pedidos()), 2)
+
+    def test_listar_combina_estado_y_cliente(self):
+        otro = self.lealtad.registrar_cliente("Grace", "grace@example.com")
+        mio = self.pedidos.registrar_pedido(self.cliente.id, [(self.cafe.id, 1)], 0)
+        self.pedidos.registrar_pedido(otro.id, [(self.te.id, 1)], 0)
+        self.pedidos.confirmar_pago(mio.id)
+        filtrados = self.pedidos.listar_pedidos(EstadoPedido.EN_PREPARACION, self.cliente.id)
+        self.assertEqual([p.id for p in filtrados], [mio.id])
+
+
 if __name__ == "__main__":
     unittest.main()

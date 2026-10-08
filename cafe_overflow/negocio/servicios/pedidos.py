@@ -152,9 +152,13 @@ class ServicioPedidos:
         """Devuelve un pedido o rechaza si no existe."""
         return self._obtener(pedido_id)
 
-    def listar_pedidos(self, estado: EstadoPedido | None = None) -> list[Pedido]:
-        """Lista pedidos, opcionalmente filtrados por estado."""
-        return self._pedidos.listar(estado)
+    def listar_pedidos(self, estado: EstadoPedido | None = None, cliente_id: int | None = None) -> list[Pedido]:
+        """Lista pedidos con filtros opcionales de estado y cliente."""
+        pedidos = self._pedidos.listar(estado)
+        # El ámbito por cliente se aplica en negocio para no exponer pedidos ajenos.
+        if cliente_id is None:
+            return pedidos
+        return [p for p in pedidos if p.cliente_id == cliente_id]
 
     def _obtener(self, pedido_id: int) -> Pedido:
         pedido = self._pedidos.obtener_por_id(pedido_id)

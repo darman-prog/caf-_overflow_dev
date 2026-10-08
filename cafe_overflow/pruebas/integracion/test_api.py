@@ -306,6 +306,24 @@ class TestVistaPrevia(BaseAPI):
         self.assertEqual(estado, 400)
 
 
+class TestFiltroCliente(BaseAPI):
+    def test_lista_solo_pedidos_del_cliente(self):
+        ana = self.nuevo_cliente("ana@example.com")
+        bob = self.nuevo_cliente("bob@example.com")
+        self.pedir("POST", "/api/pedidos", {"cliente_id": ana, "items": [{"producto_id": 1, "cantidad": 1}]})
+        self.pedir("POST", "/api/pedidos", {"cliente_id": bob, "items": [{"producto_id": 2, "cantidad": 1}]})
+        estado, mios = self.pedir("GET", f"/api/pedidos?cliente_id={ana}")
+        self.assertEqual(estado, 200)
+        self.assertEqual(len(mios), 1)
+        self.assertEqual(mios[0]["cliente_id"], ana)
+        estado, todos = self.pedir("GET", "/api/pedidos")
+        self.assertEqual(len(todos), 2)
+
+    def test_filtro_invalido_es_400(self):
+        estado, _ = self.pedir("GET", "/api/pedidos?cliente_id=mal")
+        self.assertEqual(estado, 400)
+
+
 class TestArranque(unittest.TestCase):
     def test_inicializar_bd_crea_esquema_y_semillas(self):
         temporal = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
