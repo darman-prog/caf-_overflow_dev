@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Panel del personal de Café Overflow: gestiona pedidos por estado.">
+  <title>Personal · Café Overflow</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f97316' stroke-width='2'%3E%3Cpath d='M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9z'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido principal</a>
+
+  <header class="site-header">
+    <div class="contenedor site-header__inner">
+      <a class="marca" href="personal.html" aria-label="Panel del personal, inicio">
+        <span class="marca__icono" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h12v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4V9z"/><path d="M16 10h2a2.5 2.5 0 0 1 0 5h-2"/><path d="M7 5c0-1 1-1 1-2M11 5c0-1 1-1 1-2"/></svg>
+        </span>
+        <span>Personal <span class="marca__tag">Café Overflow</span></span>
+      </a>
+      <nav class="nav-principal" aria-label="Navegación principal">
+        <a href="index.html">Vista cliente</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contenedor" id="contenido">
+    <h1>Panel del personal</h1>
+    <p class="texto-secundario">Confirma pagos y avanza pedidos. En pantallas pequeñas usa el filtro por estado.</p>
+
+    <div class="personal-controles">
+      <div class="field">
+        <label class="field__label" for="personal-filtro">Filtrar por estado</label>
+        <select class="field__select" id="personal-filtro"></select>
+      </div>
+      <button class="btn btn--secondary" id="personal-actualizar" type="button">Actualizar</button>
+    </div>
+
+    <div id="personal-estado" aria-live="polite"></div>
+
+    <div class="personal-board" id="personal-board">
+      <section class="personal-columna" id="col-PENDIENTE_DE_PAGO" aria-labelledby="t-PENDIENTE_DE_PAGO">
+        <h2 class="personal-columna__titulo" id="t-PENDIENTE_DE_PAGO">Pendiente de pago <span class="personal-columna__conteo" id="conteo-PENDIENTE_DE_PAGO"></span></h2>
+        <div id="lista-PENDIENTE_DE_PAGO"></div>
+      </section>
+      <section class="personal-columna" id="col-EN_PREPARACION" aria-labelledby="t-EN_PREPARACION">
+        <h2 class="personal-columna__titulo" id="t-EN_PREPARACION">En preparación <span class="personal-columna__conteo" id="conteo-EN_PREPARACION"></span></h2>
+        <div id="lista-EN_PREPARACION"></div>
+      </section>
+      <section class="personal-columna" id="col-LISTO" aria-labelledby="t-LISTO">
+        <h2 class="personal-columna__titulo" id="t-LISTO">Listo <span class="personal-columna__conteo" id="conteo-LISTO"></span></h2>
+        <div id="lista-LISTO"></div>
+      </section>
+      <section class="personal-columna" id="col-ENTREGADO" aria-labelledby="t-ENTREGADO">
+        <h2 class="personal-columna__titulo" id="t-ENTREGADO">Entregado <span class="personal-columna__conteo" id="conteo-ENTREGADO"></span></h2>
+        <div id="lista-ENTREGADO"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="contenedor">
+      <p>Café Overflow · <a href="index.html">Volver a la vista cliente</a>.</p>
+    </div>
+  </footer>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <noscript><p class="contenedor">Esta aplicación necesita JavaScript para gestionar pedidos.</p></noscript>
+
+  <script type="module" src="js/vistas/personal.js"></script>
+</body>
+</html>

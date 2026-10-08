@@ -1,0 +1,560 @@
+/* components.css — componentes y estados mínimos (DESING.md §5). BEM. */
+
+/* 5.1 Botones: una acción primaria por vista, altura mínima 44px. */
+.btn {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  transition: background var(--duration-fast) var(--easing-standard),
+    border-color var(--duration-fast) var(--easing-standard);
+}
+
+.btn--primary {
+  background: var(--accent-coffee);
+  color: var(--text-inverse);
+}
+
+.btn--primary:hover {
+  filter: brightness(1.08);
+}
+
+.btn--secondary {
+  background: transparent;
+  color: var(--text-main);
+  border-color: var(--border-field);
+}
+
+.btn--secondary:hover {
+  background: var(--bg-elevated);
+}
+
+.btn--danger {
+  background: transparent;
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+.btn--danger:hover {
+  background: var(--bg-elevated);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--text-main);
+}
+
+.btn--ghost:hover {
+  background: var(--bg-elevated);
+}
+
+.btn:disabled, .btn[aria-disabled="true"] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Estado loading: spinner CSS + texto "Procesando…", sin perder foco. */
+.btn__spinner {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: giro 0.8s linear infinite;
+  flex: none;
+}
+
+@keyframes giro {
+  to { transform: rotate(360deg); }
+}
+
+/* 5.2 Inputs: label arriba, borde field, error accesible. */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.field__label {
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+}
+
+.field__input, .field__select {
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  color: var(--text-main);
+  background: var(--bg-base);
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-sm);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-3);
+  width: 100%;
+}
+
+.field__input:focus-visible, .field__select:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+.field__input[aria-invalid="true"] {
+  border-color: var(--color-error);
+}
+
+.field__help {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.field__error {
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  margin: 0;
+  font-weight: var(--weight-medium);
+}
+
+/* 5.3 Stepper de cantidad: botones 44x44, valor en mono. */
+.stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.stepper__btn {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  font-size: var(--text-lg);
+  cursor: pointer;
+}
+
+.stepper__btn:hover {
+  border-color: var(--accent-coffee);
+}
+
+.stepper__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.stepper__value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  min-width: 3ch;
+  text-align: center;
+  font-size: var(--text-md);
+}
+
+/* 5.4 Tarjeta de producto estilo snippet. */
+.card-producto {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition: border-color var(--duration-fast) var(--easing-standard);
+}
+
+.card-producto:hover {
+  border-color: var(--border-field);
+}
+
+.card-producto__nombre {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+  margin: 0;
+}
+
+/* Foto local del producto: encuadre fijo, sin deformar la tarjeta. */
+.card-producto__foto {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: block;
+}
+
+.card-producto__precio {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--text-lg);
+  color: var(--accent-coffee);
+}
+
+.card-producto__acciones {
+  margin-top: auto;
+  padding-top: var(--space-2);
+}
+
+/* 5.6 Badges: pill 12px mono, texto siempre explícito. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: 0.02em;
+  border-radius: var(--radius-sm);
+  border: 1px solid;
+  padding: 0.2rem 0.6rem;
+  white-space: nowrap;
+  min-height: 24px;
+}
+
+.badge--pendiente {
+  color: var(--st-pendiente);
+  border-color: var(--st-pendiente);
+  background: rgba(210, 153, 34, 0.15);
+}
+
+.badge--preparacion {
+  color: var(--st-preparacion);
+  border-color: var(--st-preparacion);
+  background: rgba(88, 166, 255, 0.15);
+}
+
+.badge--listo {
+  color: var(--st-listo);
+  border-color: var(--st-listo);
+  background: rgba(63, 185, 80, 0.15);
+}
+
+.badge--entregado {
+  color: var(--st-entregado);
+  border-color: var(--st-entregado);
+  background: rgba(139, 148, 158, 0.15);
+}
+
+.badge--stock-ok {
+  color: var(--color-success);
+  border-color: var(--color-success);
+  background: rgba(63, 185, 80, 0.15);
+}
+
+.badge--stock-bajo {
+  color: var(--color-warning);
+  border-color: var(--color-warning);
+  background: rgba(210, 153, 34, 0.15);
+}
+
+.badge--stock-agotado {
+  color: var(--color-error);
+  border-color: var(--color-error);
+  background: rgba(248, 81, 73, 0.15);
+}
+
+.badge--junior {
+  color: var(--text-muted);
+  border-color: var(--text-muted);
+  background: transparent;
+}
+
+.badge--mid {
+  color: var(--color-info);
+  border-color: var(--color-info);
+  background: rgba(88, 166, 255, 0.15);
+}
+
+.badge--senior {
+  color: var(--accent-coffee);
+  border-color: var(--accent-coffee);
+  background: rgba(249, 115, 22, 0.15);
+}
+
+.badge--puntos {
+  color: var(--color-loyalty);
+  border-color: var(--color-loyalty);
+  background: rgba(188, 140, 255, 0.15);
+}
+
+/* 5.7 Pipeline de estado: 4 pasos con conectores tipo tubería. */
+.pipeline {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  margin: var(--space-3) 0;
+  padding: 0;
+}
+
+.pipeline__paso {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: 0.25rem 0.6rem;
+  white-space: nowrap;
+}
+
+.pipeline__conector {
+  flex: 1;
+  min-width: var(--space-2);
+  height: 2px;
+  background: var(--border-subtle);
+}
+
+.pipeline__paso--completo {
+  color: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.pipeline__paso--completo + .pipeline__conector {
+  background: var(--color-success);
+}
+
+/* El paso activo late sutil; sin pulso con reduced-motion. */
+.pipeline__paso--activo {
+  font-weight: var(--weight-bold);
+}
+
+.pipeline__paso--activo[data-estado="PENDIENTE_DE_PAGO"] {
+  color: var(--st-pendiente);
+  border-color: var(--st-pendiente);
+  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
+}
+
+.pipeline__paso--activo[data-estado="EN_PREPARACION"] {
+  color: var(--st-preparacion);
+  border-color: var(--st-preparacion);
+  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
+}
+
+.pipeline__paso--activo[data-estado="LISTO"] {
+  color: var(--st-listo);
+  border-color: var(--st-listo);
+  animation: pulso var(--duration-base) var(--easing-standard) infinite alternate;
+}
+
+@keyframes pulso {
+  from { opacity: 1; }
+  to { opacity: 0.65; }
+}
+
+/* 5.5 Resumen de compra: filas de totales del servidor. */
+.resumen {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.resumen__fila {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-block: var(--space-1);
+  font-size: var(--text-sm);
+}
+
+.resumen__fila dd {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.resumen__fila--total {
+  border-top: 1px solid var(--border-subtle);
+  margin-top: var(--space-2);
+  padding-top: var(--space-3);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+}
+
+.resumen__fila--total dd {
+  color: var(--accent-coffee);
+  font-size: var(--text-lg);
+}
+
+/* 5.9 Toasts: región fija con aria-live. */
+.toasts {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  left: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 200;
+  pointer-events: none;
+}
+
+@media (min-width: 640px) {
+  .toasts {
+    left: auto;
+    width: min(22rem, calc(100vw - 2rem));
+  }
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-field);
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+}
+
+.toast--success { border-left-color: var(--color-success); }
+.toast--error { border-left-color: var(--color-error); }
+.toast--info { border-left-color: var(--color-info); }
+
+.toast__texto {
+  flex: 1;
+  margin: 0;
+}
+
+.toast__cerrar {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  margin: calc(var(--space-2) * -1);
+  font-size: var(--text-md);
+}
+
+/* 5.10 Vacíos, carga y errores. */
+.empty {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+  border: 1px dashed var(--border-field);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+}
+
+.empty__icono {
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.error-box {
+  border: 1px solid var(--color-error);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  background: var(--bg-surface);
+}
+
+.error-box__titulo {
+  color: var(--color-error);
+  font-weight: var(--weight-bold);
+  margin: 0 0 var(--space-2);
+}
+
+/* Skeleton con texto terminal decorativo (aria-hidden). */
+.skeleton {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  background: var(--bg-surface);
+}
+
+.terminal-line {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--color-success);
+}
+
+/* Barra sticky móvil del carrito (§5.5, z-index 10). */
+.sticky-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin-top: var(--space-4);
+}
+
+/* Diálogo de registro: <dialog> nativo. */
+.dialogo {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  max-width: min(26rem, calc(100vw - 2rem));
+}
+
+.dialogo::backdrop {
+  background: rgba(13, 17, 23, 0.7);
+}
+
+/* Tabla de pedidos (desktop). */
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.tabla th, .tabla td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tabla th {
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+}
+
+/* Tarjeta de pedido (móvil). */
+.pedido-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.pedido-card__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2);
+}
+
+/* Chip de cliente en cabecera. */
+.cliente-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-3);
+  min-height: 44px;
+}

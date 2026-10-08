@@ -1,0 +1,187 @@
+/* base.css — reset mínimo, tipografía, foco y layout base (DESING.md §3.5, §3.8, §6). */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+  min-height: 100vh;
+}
+
+/* Foco solo con teclado, según §3.8. */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+h1, h2, h3 {
+  line-height: var(--leading-tight);
+  margin: 0 0 var(--space-4);
+}
+
+h1 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+}
+
+h2 {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-medium);
+}
+
+h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-medium);
+}
+
+p {
+  margin: 0 0 var(--space-4);
+}
+
+a {
+  color: var(--color-info);
+}
+
+/* Cifras monetarias, IDs y saldos: mono + tabulares (§3.5). */
+.mono, .precio, .pedido-id, .saldo-puntos {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contenedor centrado con ancho máximo (§6). */
+.contenedor {
+  max-width: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+}
+
+/* Enlace de salto para teclado y lectores (§accesibilidad). */
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  background: var(--bg-elevated);
+  color: var(--text-main);
+  border: 1px solid var(--border-field);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-4);
+  z-index: 300;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.skip-link:focus-visible {
+  top: var(--space-2);
+}
+
+/* Cabecera y navegación del sitio. */
+.site-header {
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding-block: var(--space-3);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: var(--weight-bold);
+  font-size: var(--text-lg);
+  min-height: 44px;
+}
+
+.marca__icono {
+  color: var(--accent-coffee);
+  flex: none;
+}
+
+.marca__tag {
+  color: var(--text-muted);
+  font-weight: var(--weight-regular);
+  font-size: var(--text-sm);
+}
+
+.nav-principal {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-left: auto;
+}
+
+.nav-principal a {
+  color: var(--text-main);
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+}
+
+.nav-principal a:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-subtle);
+}
+
+.seccion {
+  padding-block: var(--space-8);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.seccion__cabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.seccion__cabecera h2 {
+  margin: 0;
+  margin-right: auto;
+}
+
+.texto-secundario {
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+.site-footer {
+  padding-block: var(--space-8);
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+}
+
+/* Toda animación respeta prefers-reduced-motion (§3.8). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

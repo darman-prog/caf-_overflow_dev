@@ -1,0 +1,78 @@
+/* tokens.css — Design system Café Overflow v1.0 (Docs/DESING.md §3).
+   Dark-only, cero dependencias externas, solo fuentes del sistema. */
+
+:root {
+  color-scheme: dark;
+
+  /* 3.1 Superficies (GitHub Dark / Primer) */
+  --bg-base: #0d1117;
+  --bg-surface: #161b22;
+  --bg-elevated: #1c2128;
+
+  /* 3.1 Bordes con roles distintos: subtle decora, field delimita campos */
+  --border-subtle: #30363d;
+  --border-field: #6e7681;
+
+  /* 3.1 Texto (inverse va SOBRE el botón naranja, ratio 6.8) */
+  --text-main: #e6edf3;
+  --text-muted: #8b949e;
+  --text-inverse: #0d1117;
+
+  /* 3.2 Acentos semánticos: un tinte, un significado */
+  --accent-coffee: #f97316;
+  --color-success: #3fb950;
+  --color-warning: #d29922;
+  --color-error: #f85149;
+  --color-info: #58a6ff;
+  --color-loyalty: #bc8cff;
+
+  /* 3.3 Estados del pedido (sin solapes con stock ni niveles) */
+  --st-pendiente: #d29922;
+  --st-preparacion: #58a6ff;
+  --st-listo: #3fb950;
+  --st-entregado: #8b949e;
+
+  /* 3.5 Tipografía: solo stacks del sistema */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SFMono-Regular", "Cascadia Code", Consolas, "Liberation Mono", Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  --leading-tight: 1.25;
+  --leading-body: 1.5;
+  --weight-regular: 400;
+  --weight-medium: 600;
+  --weight-bold: 700;
+
+  /* 3.6 Espaciado base 4px */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+
+  /* 3.6 Radios: estética IDE contenida */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 999px;
+
+  /* 3.6 Breakpoints mobile-first y ancho máximo */
+  --bp-md: 640px;
+  --bp-lg: 1024px;
+  --content-max: 1200px;
+
+  /* 3.8 Foco y motion */
+  --focus-ring: 2px solid var(--color-info);
+  --focus-offset: 2px;
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --easing-standard: cubic-bezier(0.2, 0, 0, 1);
+}
