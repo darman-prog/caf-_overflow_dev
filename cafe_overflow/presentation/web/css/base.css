@@ -52,23 +52,7 @@ a[href^="#"] {
   scroll-behavior: smooth;
 }
 
-/* El header es sticky: reserva su altura para que cada ancla caiga en su
-   sección y el título no quede tapado (el header envuelve más filas en móvil). */
-html {
-  scroll-padding-top: 12rem;
-}
-
-@media (min-width: 640px) {
-  html {
-    scroll-padding-top: 8rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  html {
-    scroll-padding-top: 5.5rem;
-  }
-}
+/* El offset de anclas vive en .seccion vía scroll-margin-top (mecanismo único). */
 
 /* Foco solo con teclado, según §3.8 */
 :focus-visible {
@@ -259,6 +243,39 @@ a:hover {
 .seccion {
   padding-block: var(--space-8);
   border-bottom: 2px solid var(--border-subtle);
+  /* La sección destino domina el viewport aunque esté casi vacía (anclas). */
+  min-height: 55vh;
+  min-height: 55svh;
+  /* Único offset de ancla: altura del header sticky + respiro. */
+  scroll-margin-top: 12rem;
+}
+
+@media (min-width: 640px) {
+  .seccion {
+    scroll-margin-top: 8rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .seccion {
+    scroll-margin-top: 5.5rem;
+  }
+}
+
+/* Destello de llegada en la sección del ancla (lo apaga reduced-motion). */
+.seccion:target {
+  animation: seccion-destino 1.2s ease-out;
+}
+
+@keyframes seccion-destino {
+  from {
+    outline: 2px solid var(--accent-coffee);
+    outline-offset: 4px;
+  }
+  to {
+    outline: 2px solid transparent;
+    outline-offset: 4px;
+  }
 }
 
 .seccion:first-of-type {
