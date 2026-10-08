@@ -208,6 +208,12 @@
   color: var(--text-muted);
 }
 
+/* Bulk por columna: ancho completo para un target generoso. */
+.personal-columna .btn--bulk {
+  width: 100%;
+  margin-bottom: var(--space-3);
+}
+
 /* bp-lg = --bp-lg (1024px). */
 @media (min-width: 1024px) {
   .personal-board {
