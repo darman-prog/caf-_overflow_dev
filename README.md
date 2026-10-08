@@ -41,11 +41,6 @@ Errores `{"error": ...}`: `400` entrada inválida, `404` inexistente, `409` conf
 - DevPoints: 1 punto por cada $20.000; cada punto descuenta $200.
 - Sin stock o con pedido pendiente no se registra; los estados solo avanzan en orden.
 
-## Supuestos
-
-- Completado = Entregado (acumulado sobre lo pagado); nivel primero, puntos después, total ≥ 0.
-- Stock y puntos se descuentan al registrar; ascensos y puntos al entregar; confirma el personal; datos ficticios.
-
 ## Reglas arquitectónicas
 
 - Presentación no calcula ni accede a la BD; negocio sin JSON/SQL; persistencia sin reglas de negocio.
