@@ -192,26 +192,94 @@
   margin: 0;
 }
 
+/* Barra de ventana snippet: puntos decorativos + badge de stock a la derecha. */
+.card-producto__ventana {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-producto__puntos {
+  width: 44px;
+  height: 12px;
+  background-repeat: no-repeat;
+  background-image:
+    radial-gradient(circle at 6px 6px, var(--color-error) 5px, transparent 5.5px),
+    radial-gradient(circle at 22px 6px, var(--color-warning) 5px, transparent 5.5px),
+    radial-gradient(circle at 38px 6px, var(--color-success) 5px, transparent 5.5px);
+}
+
+/* Agotado: tarjeta tenue con foto en grises; el botón ya se deshabilita. */
+.card-producto--agotado {
+  opacity: 0.72;
+}
+
+.card-producto--agotado .card-producto__foto {
+  filter: grayscale(1);
+}
+
+/* Marco con recorte para el zoom sutil (respeta reduced-motion global). */
+.card-producto__marco {
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+}
+
 /* Foto local del producto: encuadre fijo, sin deformar la tarjeta. */
 .card-producto__foto {
   width: 100%;
   aspect-ratio: 16 / 9;
   object-fit: cover;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
   display: block;
+  transition: transform var(--duration-fast) var(--easing-standard);
+}
+
+.card-producto:hover .card-producto__foto {
+  transform: scale(1.03);
+}
+
+.card-producto:focus-within {
+  border-color: var(--accent-coffee);
 }
 
 .card-producto__precio {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-size: var(--text-lg);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
   color: var(--accent-coffee);
 }
 
 .card-producto__acciones {
   margin-top: auto;
   padding-top: var(--space-2);
+}
+
+/* Esqueleto con forma de tarjeta para la carga del menú. */
+.skeleton-bloque {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+}
+
+.skeleton-bloque--foto {
+  aspect-ratio: 16 / 9;
+}
+
+.skeleton-bloque--texto {
+  height: 1rem;
+}
+
+.skeleton-bloque--precio {
+  height: 1.5rem;
+  width: 40%;
+}
+
+.skeleton-bloque--boton {
+  height: 44px;
 }
 
 /* 5.6 Badges: pill 13px/600 mono, texto siempre explícito.
