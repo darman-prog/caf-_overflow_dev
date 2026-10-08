@@ -14,6 +14,11 @@ Aplicación web de pedidos en línea para un café temático de desarrolladores,
 Desde la carpeta `cafe_overflow`, ejecuta:
 
 ```powershell
+cd cafe_overflow
+```
+y para ejecutar
+
+```powershell
 python main.py
 ```
 
