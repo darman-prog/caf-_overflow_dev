@@ -185,8 +185,17 @@ export function toast(mensaje, tipo = "info") {
   cerrar.addEventListener("click", () => aviso.remove());
   aviso.appendChild(cerrar);
   region.appendChild(aviso);
-  // Auto-descarte a los 5 s sin robar el foco.
-  setTimeout(() => aviso.remove(), 5000);
+  // Auto-descarte a los 5 s sin robar el foco; se pausa con hover/foco.
+  let temporizador = setTimeout(() => aviso.remove(), 5000);
+  const pausar = () => clearTimeout(temporizador);
+  const reanudar = () => {
+    pausar();
+    temporizador = setTimeout(() => aviso.remove(), 5000);
+  };
+  aviso.addEventListener("mouseenter", pausar);
+  aviso.addEventListener("mouseleave", reanudar);
+  aviso.addEventListener("focusin", pausar);
+  aviso.addEventListener("focusout", reanudar);
 }
 
 // Loading accesible en botones: spinner + "Procesando…", sin perder foco.

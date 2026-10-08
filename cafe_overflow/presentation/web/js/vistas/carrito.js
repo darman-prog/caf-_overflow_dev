@@ -87,7 +87,7 @@ function lineaCarrito(renglon) {
   const max = producto ? producto.stock : 99;
   const stepper = el("div", { clase: "stepper" });
   const menos = el("button", { clase: "stepper__btn", texto: "−", attrs: { type: "button", "aria-label": `Quitar uno de ${nombre}` } });
-  const valor = el("span", { clase: "stepper__value", texto: String(renglon.cantidad), attrs: { "aria-label": `Cantidad de ${nombre}` } });
+  const valor = el("output", { clase: "stepper__value", texto: String(renglon.cantidad), attrs: { "aria-label": `Cantidad de ${nombre}`, "aria-live": "polite" } });
   const mas = el("button", { clase: "stepper__btn", texto: "+", attrs: { type: "button", "aria-label": `Agregar uno de ${nombre}` } });
   menos.addEventListener("click", () => cambiarCantidad(renglon.producto_id, renglon.cantidad - 1));
   mas.addEventListener("click", () => cambiarCantidad(renglon.producto_id, renglon.cantidad + 1, max));
