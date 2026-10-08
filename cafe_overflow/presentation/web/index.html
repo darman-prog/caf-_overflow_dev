@@ -40,7 +40,6 @@
     <section class="seccion" id="seccion-menu" aria-labelledby="titulo-menu">
       <div class="seccion__cabecera">
         <h2 id="titulo-menu">Menú</h2>
-        <button class="btn btn--secondary" id="menu-actualizar" type="button">Actualizar</button>
       </div>
       <div class="menu-filtros">
         <div class="field">
@@ -55,7 +54,6 @@
     <section class="seccion" id="seccion-carrito" aria-labelledby="titulo-carrito">
       <div class="seccion__cabecera">
         <h2 id="titulo-carrito">Carrito</h2>
-        <button class="btn btn--secondary" id="carrito-actualizar" type="button">Actualizar</button>
       </div>
       <div class="carrito-layout">
         <div>
@@ -74,16 +72,15 @@
           </p>
         </div>
       </div>
-      <div class="sticky-bar" aria-label="Total y confirmación">
+      <div class="sticky-bar" id="sticky-bar" aria-label="Total del carrito" hidden>
         <strong>Total: <span class="mono" id="carrito-total-barra">—</span></strong>
-        <button class="btn btn--primary" id="carrito-ir-confirmar" type="button">Confirmar</button>
+        <button class="btn btn--secondary" id="carrito-ir-resumen" type="button">Revisar total</button>
       </div>
     </section>
 
     <section class="seccion" id="seccion-pedidos" aria-labelledby="titulo-pedidos">
       <div class="seccion__cabecera">
         <h2 id="titulo-pedidos">Mis pedidos</h2>
-        <button class="btn btn--secondary" id="pedidos-actualizar" type="button">Actualizar</button>
       </div>
       <div id="pedidos-estado" aria-live="polite"></div>
       <div class="pedidos-cards" id="pedidos-cards"></div>
@@ -101,7 +98,6 @@
     <section class="seccion" id="seccion-perfil" aria-labelledby="titulo-perfil">
       <div class="seccion__cabecera">
         <h2 id="titulo-perfil">Perfil y lealtad</h2>
-        <button class="btn btn--secondary" id="perfil-actualizar" type="button">Actualizar</button>
         <button class="btn btn--ghost" id="abrir-registro" type="button">Registrarme</button>
       </div>
       <div id="perfil-contenido" aria-live="polite"></div>
@@ -110,7 +106,7 @@
 
   <footer class="site-footer">
     <div class="contenedor">
-      <p>Café Overflow · Totales y descuentos calculados por el servidor. <a href="personal.html">Panel del personal</a>.</p>
+      <p><span class="terminal-line" aria-hidden="true">&gt; pedido_listo --totales-del-servidor_</span><br>Café Overflow · Totales y descuentos calculados por el servidor. <a href="personal.html">Panel del personal</a>.</p>
     </div>
   </footer>
 
@@ -143,5 +139,6 @@
   <script type="module" src="js/vistas/carrito.js"></script>
   <script type="module" src="js/vistas/pedidos.js"></script>
   <script type="module" src="js/vistas/perfil.js"></script>
+  <script type="module" src="js/vistas/nav.js"></script>
 </body>
 </html>

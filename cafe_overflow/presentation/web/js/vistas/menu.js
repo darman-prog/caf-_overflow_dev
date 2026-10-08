@@ -85,7 +85,6 @@ async function cargar() {
 }
 
 function init() {
-  document.getElementById("menu-actualizar")?.addEventListener("click", () => cargar());
   const buscador = document.getElementById("menu-buscar");
   buscador?.addEventListener("input", () => {
     filtro = buscador.value;

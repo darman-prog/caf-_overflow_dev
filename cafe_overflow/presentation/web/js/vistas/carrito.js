@@ -132,6 +132,8 @@ function pintarItems() {
   const lista = document.getElementById("carrito-items");
   lista.textContent = "";
   const items = leerCarrito();
+  // La barra sticky solo existe cuando hay algo que confirmar.
+  document.getElementById("sticky-bar").hidden = items.length === 0;
   if (items.length === 0) {
     lista.appendChild(el("p", { clase: "texto-secundario", texto: "Aún no tienes pedidos en el carrito. Explora el menú." }));
   } else {
@@ -198,11 +200,10 @@ function init() {
     vaciarCarrito();
     toast("Carrito vaciado.", "info");
   });
-  document.getElementById("carrito-actualizar")?.addEventListener("click", () => refrescar());
-  // La barra sticky acerca el foco a la confirmación sin duplicar acciones.
-  document.getElementById("carrito-ir-confirmar")?.addEventListener("click", () => {
-    document.getElementById("carrito-confirmar")?.focus();
-    document.getElementById("carrito-confirmar")?.scrollIntoView({ block: "nearest" });
+  // La barra sticky navega al resumen; la única confirmación primaria vive en el panel.
+  document.getElementById("carrito-ir-resumen")?.addEventListener("click", () => {
+    document.getElementById("carrito-resumen")?.scrollIntoView({ block: "nearest" });
+    document.getElementById("carrito-confirmar")?.focus({ preventScroll: true });
   });
   window.addEventListener("carrito:actualizado", () => refrescar());
   window.addEventListener("pedidos:actualizado", () => pintarDisponibles());

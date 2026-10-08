@@ -497,6 +497,11 @@
   margin-top: var(--space-4);
 }
 
+/* Oculta de verdad con hidden (display:flex anularía el UA) y en desktop con panel visible. */
+.sticky-bar[hidden] {
+  display: none;
+}
+
 /* Diálogo de registro: <dialog> nativo. */
 .dialogo {
   background: var(--bg-surface);

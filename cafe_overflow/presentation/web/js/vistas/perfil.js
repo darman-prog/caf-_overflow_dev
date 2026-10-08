@@ -99,7 +99,6 @@ function init() {
   const form = document.getElementById("registro-form");
   const inputNombre = document.getElementById("registro-nombre");
   const inputCorreo = document.getElementById("registro-correo");
-  document.getElementById("perfil-actualizar")?.addEventListener("click", () => cargar());
   document.getElementById("abrir-registro")?.addEventListener("click", () => dialogo?.showModal());
   window.addEventListener("cliente:actualizado", () => cargar());
 

@@ -111,7 +111,6 @@ async function cargar() {
 }
 
 function init() {
-  document.getElementById("pedidos-actualizar")?.addEventListener("click", () => cargar());
   window.addEventListener("pedidos:actualizado", () => cargar());
   window.addEventListener("cliente:actualizado", () => cargar());
   cargar();

@@ -1,5 +1,13 @@
 /* views.css — vistas y layout mobile-first (DESING.md §6). */
 
+/* Fusión terminal-café: prompt decorativo ante títulos de sección.
+   Va en CSS para que los lectores no lo anuncien; no compite con los datos. */
+.seccion__cabecera h2::before {
+  content: "> ";
+  color: var(--color-success);
+  font-family: var(--font-mono);
+}
+
 /* Menú: 1 col base → 2 cols ≥640px → 3 cols ≥1024px. */
 .menu-grid {
   display: grid;
@@ -42,9 +50,9 @@
     align-items: start;
   }
 
-  /* En desktop la barra sticky se integra al panel. */
+  /* En desktop el resumen está visible: la sticky sobra. */
   .sticky-bar {
-    position: static;
+    display: none;
   }
 }
 
