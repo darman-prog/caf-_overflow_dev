@@ -24,12 +24,30 @@ RUTA_BD = RAIZ / "cafe_overflow.db"
 PUERTO = 8000
 
 
+TABLAS_REQUERIDAS = frozenset({"productos", "clientes", "pedidos", "items_pedido"})
+
+
+def _tablas_existentes(ruta_bd) -> set[str]:
+    conexion = sqlite3.connect(ruta_bd)
+    try:
+        filas = conexion.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table'"
+        ).fetchall()
+        return {fila[0] for fila in filas}
+    finally:
+        conexion.close()
+
+
 def inicializar_bd(ruta_bd, reiniciar=False):
-    """Crea el esquema y carga los datos iniciales si la base no existe."""
+    """Crea el esquema y carga los datos iniciales si la base no está lista.
+
+    Un archivo existente pero vacío (p. ej. creado por una conexión
+    interrumpida) se inicializa igual: lo que vale es que estén las tablas.
+    """
     ruta_bd = Path(ruta_bd)
     if reiniciar and ruta_bd.exists():
         ruta_bd.unlink()
-    if ruta_bd.exists():
+    if ruta_bd.exists() and TABLAS_REQUERIDAS <= _tablas_existentes(ruta_bd):
         return False
     esquema = (RAIZ / "persistencia" / "esquema.sql").read_text(encoding="utf-8")
     semillas = (RAIZ / "persistencia" / "datos_iniciales.sql").read_text(

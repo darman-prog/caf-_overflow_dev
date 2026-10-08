@@ -431,5 +431,53 @@ class TestArranque(unittest.TestCase):
             ruta.unlink(missing_ok=True)
 
 
+    def test_inicializar_bd_con_archivo_vacio_existente(self):
+        # Un archivo vacío (p. ej. creado por una conexión interrumpida) se inicializa igual.
+        temporal = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        temporal.close()
+        ruta = Path(temporal.name)
+        try:
+            self.assertTrue(inicializar_bd(ruta))
+            conexion = sqlite3.connect(ruta)
+            try:
+                total = conexion.execute(
+                    "SELECT COUNT(*) FROM productos"
+                ).fetchone()[0]
+            finally:
+                conexion.close()
+            self.assertEqual(total, 6)
+        finally:
+            ruta.unlink(missing_ok=True)
+
+    def test_inicializar_bd_con_base_sana_no_toca_nada(self):
+        temporal = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+        temporal.close()
+        ruta = Path(temporal.name)
+        ruta.unlink()
+        try:
+            self.assertTrue(inicializar_bd(ruta))
+            conexion = sqlite3.connect(ruta)
+            try:
+                conexion.execute(
+                    "INSERT INTO productos (nombre, precio_base, stock)"
+                    " VALUES ('Prueba Temporal', 1000, 1)"
+                )
+                conexion.commit()
+            finally:
+                conexion.close()
+            # Con las tablas presentes no se toca nada, ni siquiera con datos propios.
+            self.assertFalse(inicializar_bd(ruta))
+            conexion = sqlite3.connect(ruta)
+            try:
+                total = conexion.execute(
+                    "SELECT COUNT(*) FROM productos"
+                ).fetchone()[0]
+            finally:
+                conexion.close()
+            self.assertEqual(total, 7)
+        finally:
+            ruta.unlink(missing_ok=True)
+
+
 if __name__ == "__main__":
     unittest.main()
