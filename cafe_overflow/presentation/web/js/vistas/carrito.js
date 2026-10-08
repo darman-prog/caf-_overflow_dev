@@ -147,7 +147,29 @@ function refrescar() {
   pintarDisponibles();
 }
 
-async function confirmar(boton) {
+// Revisión previa al envío: el modal pinta el desglose fresco del servidor.
+let revisionPendiente = null;
+let focoAlCerrar = null;
+
+function pintarDesglose(contenedor, totales, lineas) {
+  contenedor.textContent = "";
+  // Solo cuenta líneas del carrito; el dinero llega intacto del servidor.
+  contenedor.appendChild(el("p", {
+    clase: "texto-secundario",
+    texto: `${lineas} ${lineas === 1 ? "producto" : "productos"} en el carrito`,
+  }));
+  const lista = el("dl", { clase: "resumen" });
+  lista.appendChild(filaResumen("Subtotal", cop(totales.subtotal)));
+  lista.appendChild(filaResumen("Descuento por nivel", `− ${cop(totales.descuento_nivel)}`));
+  lista.appendChild(filaResumen("Descuento por DevPoints", `− ${cop(totales.descuento_puntos)}`));
+  const total = el("div", { clase: "resumen__fila resumen__fila--total" });
+  total.appendChild(el("dt", { texto: "Total" }));
+  total.appendChild(el("dd", { texto: cop(totales.total) }));
+  lista.appendChild(total);
+  contenedor.appendChild(lista);
+}
+
+async function revisar(boton) {
   const clienteId = getClienteId();
   if (!clienteId) {
     abrirRegistro();
@@ -161,8 +183,31 @@ async function confirmar(boton) {
   const texto = boton.textContent;
   botonCargando(boton, true);
   try {
+    // Desglose fresco justo antes de enviar; si algo cambió, el servidor lo dice.
+    const totales = await api.vistaPrevia({ cliente_id: Number(clienteId), items, devpoints_a_canjear: canje });
+    revisionPendiente = { items, canje, clienteId: Number(clienteId) };
+    pintarDesglose(document.getElementById("revision-desglose"), totales, items.length);
+    const dialogo = document.getElementById("dialogo-revision");
+    focoAlCerrar = boton;
+    if (dialogo && !dialogo.open) dialogo.showModal();
+    document.getElementById("revision-confirmar")?.focus();
+  } catch (error) {
+    toast(error instanceof ApiError ? error.message : "No se pudo revisar el pedido.", "error");
+  } finally {
+    botonCargando(boton, false, texto);
+  }
+}
+
+async function enviarRevision(boton) {
+  if (!revisionPendiente) return;
+  const { items, canje, clienteId } = revisionPendiente;
+  const texto = boton.textContent;
+  botonCargando(boton, true);
+  try {
     // El total definitivo lo calcula y persiste el servidor; aquí solo se muestra.
-    const pedido = await api.crearPedido({ cliente_id: Number(clienteId), items, devpoints_a_canjear: canje });
+    const pedido = await api.crearPedido({ cliente_id: clienteId, items, devpoints_a_canjear: canje });
+    revisionPendiente = null;
+    document.getElementById("dialogo-revision")?.close();
     vaciarCarrito();
     devpointsEditados = "";
     const input = document.getElementById("devpoints-input");
@@ -171,6 +216,8 @@ async function confirmar(boton) {
     window.dispatchEvent(new CustomEvent("pedidos:actualizado"));
     refrescar();
   } catch (error) {
+    // El 409 conserva el carrito y muestra el mensaje del servidor.
+    document.getElementById("dialogo-revision")?.close();
     toast(error instanceof ApiError ? error.message : "No se pudo registrar el pedido.", "error");
   } finally {
     botonCargando(boton, false, texto);
@@ -195,10 +242,33 @@ function init() {
     input.setAttribute("aria-invalid", /^\d*$/.test(input.value) ? "false" : "true");
     programarPrevia();
   });
-  document.getElementById("carrito-confirmar")?.addEventListener("click", (e) => confirmar(e.currentTarget));
-  document.getElementById("carrito-vaciar")?.addEventListener("click", () => {
+  document.getElementById("carrito-confirmar")?.addEventListener("click", (e) => revisar(e.currentTarget));
+  document.getElementById("revision-confirmar")?.addEventListener("click", (e) => enviarRevision(e.currentTarget));
+  document.getElementById("revision-cancelar")?.addEventListener("click", () => document.getElementById("dialogo-revision")?.close());
+  document.getElementById("dialogo-revision")?.addEventListener("close", () => {
+    // Esc o Cancelar devuelven el foco a quien abrió la revisión.
+    if (focoAlCerrar?.isConnected) focoAlCerrar.focus({ preventScroll: true });
+    focoAlCerrar = null;
+  });
+  document.getElementById("carrito-vaciar")?.addEventListener("click", (e) => {
+    if (leerCarrito().length === 0) {
+      toast("El carrito ya está vacío.", "info");
+      return;
+    }
+    const dialogo = document.getElementById("dialogo-vaciar");
+    focoAlCerrar = e.currentTarget;
+    if (dialogo && !dialogo.open) dialogo.showModal();
+    document.getElementById("vaciar-confirmar")?.focus();
+  });
+  document.getElementById("vaciar-confirmar")?.addEventListener("click", () => {
     vaciarCarrito();
+    document.getElementById("dialogo-vaciar")?.close();
     toast("Carrito vaciado.", "info");
+  });
+  document.getElementById("vaciar-cancelar")?.addEventListener("click", () => document.getElementById("dialogo-vaciar")?.close());
+  document.getElementById("dialogo-vaciar")?.addEventListener("close", () => {
+    if (focoAlCerrar?.isConnected) focoAlCerrar.focus({ preventScroll: true });
+    focoAlCerrar = null;
   });
   // La barra sticky navega al resumen; la única confirmación primaria vive en el panel.
   document.getElementById("carrito-ir-resumen")?.addEventListener("click", () => {

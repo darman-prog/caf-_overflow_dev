@@ -135,6 +135,25 @@
     </form>
   </dialog>
 
+  <dialog class="dialogo" id="dialogo-revision" aria-labelledby="revision-titulo">
+    <h2 id="revision-titulo">Revisa tu pedido</h2>
+    <p class="texto-secundario">Valores calculados por el servidor.</p>
+    <div id="revision-desglose" aria-live="polite"></div>
+    <p>
+      <button class="btn btn--primary" id="revision-confirmar" type="button">Confirmar</button>
+      <button class="btn btn--ghost" id="revision-cancelar" type="button">Cancelar</button>
+    </p>
+  </dialog>
+
+  <dialog class="dialogo" id="dialogo-vaciar" aria-labelledby="vaciar-titulo">
+    <h2 id="vaciar-titulo">¿Vaciar el carrito?</h2>
+    <p class="texto-secundario">Se quitarán todos los productos del carrito.</p>
+    <p>
+      <button class="btn btn--danger" id="vaciar-confirmar" type="button">Vaciar</button>
+      <button class="btn btn--ghost" id="vaciar-cancelar" type="button">Cancelar</button>
+    </p>
+  </dialog>
+
   <div class="toasts" id="toasts" aria-live="polite"></div>
   <noscript><p class="contenedor">Esta aplicación necesita JavaScript para pedir y ver tus pedidos.</p></noscript>
 
